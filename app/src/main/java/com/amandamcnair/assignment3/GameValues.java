@@ -46,4 +46,5 @@ public class GameValues {
     public MediaPlayer mediaPlayer = new MediaPlayer();
 
     public AudioFeatures audioFeatures = new AudioFeatures(mediaPlayer, mediaState, context);
+
 }

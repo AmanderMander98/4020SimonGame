@@ -67,8 +67,7 @@ public class SimonRewindGame extends AppCompatActivity {
         RGV.soundPool.setOnLoadCompleteListener(new SoundPool.OnLoadCompleteListener() {
             @Override
             public void onLoadComplete(SoundPool soundPool, int sampleID, int status) {
-                if (status == 0) // success
-                {
+                if (status == 0) { // success
                     RGV.soundsLoaded.add(sampleID);
                     Log.i("SOUND", "Sound loaded " + sampleID);
                 } else {
@@ -235,12 +234,6 @@ public class SimonRewindGame extends AppCompatActivity {
         }
     };
 
-    private void playSound(int soundId) {
-        if (RGV.soundsLoaded.contains(soundId)) {
-            RGV.soundPool.play(soundId, 1.0f, 1.0f, 0, 0, 1.0f);
-        }
-    }
-
 
     private int j;
     private void playGame() {
@@ -272,58 +265,27 @@ public class SimonRewindGame extends AppCompatActivity {
                 @Override
                 public void run() {
 
-                    if (RGV.plays[newJ] == 1)
-                    {
-                        playSound(RGV.bell);
-                        //findViewById(R.id.red_button).performClick();
-                        // when button auto clicks, it will animate
-                        RGV.animation.setDuration(300);
-                        RGV.animation.setInterpolator(new LinearInterpolator());
-                        findViewById(R.id.red_button_sr).startAnimation(RGV.animation);
+                    if (RGV.plays[newJ] == 1) {
+                        runAnimationAndPlaySound(RGV.bell);
                         //Toast.makeText(getApplicationContext(), "Red!", Toast.LENGTH_SHORT).show();
-
-                    }
-                    else if (RGV.plays[newJ] == 2)
-                    {
-                        playSound(RGV.ding);
-                        //findViewById(R.id.green_button).performClick();
-                        // when button auto clicks, it will animate
-                        RGV.animation.setDuration(300);
-                        RGV.animation.setInterpolator(new LinearInterpolator());
-                        findViewById(R.id.green_button_sr).startAnimation(RGV.animation);
+                    } else if (RGV.plays[newJ] == 2) {
+                        //playSound(RGV.ding);
+                        runAnimationAndPlaySound(RGV.ding);
                         //Toast.makeText(getApplicationContext(), "Green!", Toast.LENGTH_SHORT).show();
-
-                    }
-                    else if (RGV.plays[newJ] == 3)
-                    {
-                        playSound(RGV.dong);
-
-                        findViewById(R.id.blue_button).performClick();
-                        // when button auto clicks, it will animate
-                        RGV.animation.setDuration(300);
-                        RGV.animation.setInterpolator(new LinearInterpolator());
-                        findViewById(R.id.blue_button_sr).startAnimation(RGV.animation);
-
+                    } else if (RGV.plays[newJ] == 3) {
+                        //playSound(RGV.dong);
+                        runAnimationAndPlaySound(RGV.dong);
                         //Toast.makeText(getApplicationContext(), "Blue!", Toast.LENGTH_SHORT).show();
 
-                    }
-                    else if (RGV.plays[newJ] == 4)
-                    {
-                        playSound(RGV.high_ding);
-
-                        //findViewById(R.id.yellow_button).performClick();
-
-                        // when button auto clicks, it will animate
-                        Animation animation = new AlphaAnimation(1, 0);
-                        animation.setDuration(300);
-                        animation.setInterpolator(new LinearInterpolator());
-                        findViewById(R.id.yellow_button_sr).startAnimation(animation);
+                    } else if (RGV.plays[newJ] == 4) {
+                        //playSound(RGV.high_ding);
+                        runAnimationAndPlaySound(RGV.high_ding);
                         //Toast.makeText(getApplicationContext(), "Yellow!", Toast.LENGTH_SHORT).show();
                     }
-
                 }
 
             };
+
             RGV.handler.postDelayed(runnable, (1000) * j);
         }
     }
@@ -361,8 +323,7 @@ public class SimonRewindGame extends AppCompatActivity {
     class PauseListener implements View.OnClickListener{
         @Override
         public void onClick(View view) {
-            if(RGV.audioFeatures.mediaPlayer != null)
-            {
+            if(RGV.audioFeatures.mediaPlayer != null)  {
                 RGV.audioFeatures.mediaPlayer.pause();
                 RGV.audioFeatures.mediaState = MainActivity.MediaState.PAUSED;
             }
@@ -375,5 +336,21 @@ public class SimonRewindGame extends AppCompatActivity {
         public void onClick(View view) {
             RGV.audioFeatures.stopAudio();
         }
+    }
+
+    private void playSound(int soundId) {
+        if (RGV.soundsLoaded.contains(soundId)) {
+            RGV.soundPool.play(soundId, 1.0f, 1.0f, 0, 0, 1.0f);
+        }
+    }
+
+    public void runAnimationAndPlaySound(int sound) {
+        playSound(sound);
+
+        //findViewById(R.id.blue_button).performClick();
+        // when button auto clicks, it will animate
+        RGV.animation.setDuration(300);
+        RGV.animation.setInterpolator(new LinearInterpolator());
+        findViewById(R.id.blue_button_sr).startAnimation(RGV.animation);
     }
 }
