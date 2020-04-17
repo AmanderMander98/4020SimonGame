@@ -407,12 +407,14 @@ private int j;
         }
     }
 
+
+
     private void playAudio()
     {
         if(mediaPlayer == null)
         {
             mediaState = MainActivity.MediaState.NOT_READY;
-            mediaPlayer = MediaPlayer.create(getApplicationContext(), R.raw.mushroom_theme_0);
+            mediaPlayer = MediaPlayer.create(getApplicationContext(),R.raw.mushroom_theme_0);
             mediaPlayer.setLooping(true);
 
             mediaPlayer.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {

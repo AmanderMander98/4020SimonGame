@@ -32,15 +32,15 @@
                 app:layout_constraintTop_toBottomOf="@+id/simon_trickster_title" />
 
             <Button
-                android:id="@+id/button4"
+                android:id="@+id/simon_rewind_button_mainactivity"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:background="?android:attr/selectableItemBackground"
-                android:text="ANOTHER VARIATION"
-                android:textColor="#fff"
-                android:textSize="30sp"
                 android:paddingTop="20px"
                 android:paddingBottom="20px"
+                android:text="SIMON REWIND"
+                android:textColor="#fff"
+                android:textSize="30sp"
                 app:layout_constraintBottom_toTopOf="@+id/about_button"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="0.458"
@@ -71,7 +71,7 @@
                 android:text="Simon Trickster(Surprise)"
                 android:textColor="#fff"
                 android:textSize="30sp"
-                app:layout_constraintBottom_toTopOf="@+id/button4"
+                app:layout_constraintBottom_toTopOf="@+id/simon_rewind_button_mainactivity"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="0.458"
                 app:layout_constraintStart_toStartOf="parent"
