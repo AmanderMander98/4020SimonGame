@@ -31,8 +31,7 @@ public class GameValues {
     public int highestScore = 0;
     public Random random = new Random();
     public final Handler handler = new Handler();
-    //private SoundPool soundPool;
-    //private int lose = soundPool.load(this, R.raw.lose, 1);
+
     public SoundPool soundPool;
     public Set<Integer> soundsLoaded;
     public int bell;

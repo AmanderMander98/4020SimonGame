@@ -253,6 +253,7 @@ public class SimonOriginalGame extends AppCompatActivity {
                             highestScoreText.setText("High score: " + highestScore);
 
                         }
+
                         final Runnable runnable = new Runnable() {
                             public void run() {
                                 playGame();
