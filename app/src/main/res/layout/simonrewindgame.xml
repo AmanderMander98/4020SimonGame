@@ -17,7 +17,7 @@
         android:fontFamily="monospace"
         android:text="Score:"
         android:textColor="#fff"
-        android:textSize="30sp"
+        android:textSize="22sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/imageView2" />
@@ -29,7 +29,7 @@
         android:fontFamily="monospace"
         android:text="Highest Score:"
         android:textColor="#fff"
-        android:textSize="30sp"
+        android:textSize="22sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/score_textview_sr" />

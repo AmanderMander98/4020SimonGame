@@ -17,19 +17,19 @@
         android:fontFamily="monospace"
         android:text="Score:"
         android:textColor="#fff"
-        android:textSize="30sp"
+        android:textSize="22sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/simonOriginalTV" />
 
     <TextView
         android:id="@+id/highestscore_textview"
-        android:fontFamily="monospace"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:fontFamily="monospace"
         android:text="Highest Score:"
-        android:textSize="30sp"
         android:textColor="#fff"
+        android:textSize="22sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/score_textview" />
