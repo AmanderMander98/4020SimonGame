@@ -11,33 +11,22 @@
 
 
     <TextView
-        android:id="@+id/simon_rewind_title"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="SIMON"
-        android:textColor="#fff"
-        android:textSize="50sp"
-        android:textStyle="bold"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.498"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/stop_button_sr" />
-
-    <TextView
         android:id="@+id/score_textview_sr"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:fontFamily="monospace"
         android:text="Score:"
         android:textColor="#fff"
         android:textSize="30sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/simon_rewind_title" />
+        app:layout_constraintTop_toBottomOf="@+id/imageView2" />
 
     <TextView
         android:id="@+id/highestscore_textview_sr"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:fontFamily="monospace"
         android:text="Highest Score:"
         android:textColor="#fff"
         android:textSize="30sp"
@@ -49,6 +38,7 @@
         android:id="@+id/start_button_sr"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:fontFamily="monospace"
         android:background="#000"
         android:text="START"
         android:textColor="#fff"
@@ -106,10 +96,12 @@
         android:id="@+id/play_button_sr"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:background="?android:attr/selectableItemBackground"
         android:text="PLAY"
         android:textColor="#fff"
         android:textSize="20sp"
-        android:background="?android:attr/selectableItemBackground"
+        app:layout_constraintEnd_toStartOf="@+id/pause_button_sr"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -117,11 +109,12 @@
         android:id="@+id/pause_button_sr"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="88dp"
+        android:layout_marginTop="16dp"
         android:background="?android:attr/selectableItemBackground"
         android:text="PAUSE"
         android:textColor="#fff"
         android:textSize="20sp"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -129,12 +122,22 @@
         android:id="@+id/stop_button_sr"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="176dp"
+        android:layout_marginTop="16dp"
         android:background="?android:attr/selectableItemBackground"
         android:text="STOP"
         android:textColor="#fff"
         android:textSize="20sp"
-        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/pause_button_sr"
         app:layout_constraintTop_toTopOf="parent" />
+
+    <ImageView
+        android:id="@+id/imageView2"
+        android:layout_width="293dp"
+        android:layout_height="109dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/stop_button_sr"
+        app:srcCompat="@drawable/simon_rewind_name" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
