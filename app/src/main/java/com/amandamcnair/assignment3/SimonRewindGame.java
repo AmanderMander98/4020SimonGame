@@ -6,12 +6,12 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.media.AudioAttributes;
+import android.media.MediaPlayer;
 import android.media.SoundPool;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
-import android.view.animation.AlphaAnimation;
 import android.view.animation.LinearInterpolator;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -22,9 +22,10 @@ import java.util.HashSet;
 
 public class SimonRewindGame extends AppCompatActivity {
 
-    //RGV = rewind game values
-    //Context context = getApplicationContext();
-    GameValues RGV = new GameValues(this);
+    public MainActivity.MediaState mediaState;
+    public MediaPlayer mediaPlayer;
+
+    private GameValues RGV = new GameValues();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -63,7 +64,6 @@ public class SimonRewindGame extends AppCompatActivity {
         spBuilder.setMaxStreams(1);
 
         RGV.soundPool = spBuilder.build();
-
         RGV.soundPool.setOnLoadCompleteListener(new SoundPool.OnLoadCompleteListener() {
             @Override
             public void onLoadComplete(SoundPool soundPool, int sampleID, int status) {
@@ -81,9 +81,7 @@ public class SimonRewindGame extends AppCompatActivity {
 
         loadSoundPoolSounds();
 
-        setOnTouchListeners();
-
-        disableButtons();
+        //disableButtons();
 
         findViewById(R.id.start_button_sr).setOnClickListener(new View.OnClickListener() {
             @Override
@@ -92,13 +90,14 @@ public class SimonRewindGame extends AppCompatActivity {
                 findViewById(R.id.start_button_sr).setEnabled(false);
                 Toast.makeText(getApplicationContext(), "Game has begun!", Toast.LENGTH_SHORT).show();
 
+                setOnTouchListeners();
             }
         });
 
+        showRulesAlertDialog();
     }
 
-
-    View.OnTouchListener touched = new View.OnTouchListener() {
+    View.OnTouchListener onTouchListener = new View.OnTouchListener() {
         @Override
         public boolean onTouch(View v, MotionEvent event) {
             if (event.getAction() == MotionEvent.ACTION_DOWN) {
@@ -151,41 +150,16 @@ public class SimonRewindGame extends AppCompatActivity {
 
                 //if the user gets its right
                 if (v.getId() == R.id.red_button_sr) {
-                    playSound(RGV.bell);
-                    // when I click, it will animate
-                    RGV.animation = new AlphaAnimation(1, 0);
-                    RGV.animation.setDuration(300);
-                    RGV.animation.setInterpolator(new LinearInterpolator());
-                    findViewById(R.id.red_button_sr).startAnimation(RGV.animation);
-                    //Log.i("PRESSED RED", "Red");
+                    runAnimationAndPlaySound(findViewById(R.id.red_button_sr), RGV.bell);
                 } else if (v.getId() == R.id.green_button_sr) {
-                    playSound(RGV.ding);
-                    // when I click, it will animate
-                    RGV.animation = new AlphaAnimation(1, 0);
-                    RGV.animation.setDuration(300);
-                    RGV.animation.setInterpolator(new LinearInterpolator());
-                    findViewById(R.id.green_button_sr).startAnimation(RGV.animation);
-                    //Log.i("PRESSED GREEN", "Green");
+                    runAnimationAndPlaySound(findViewById(R.id.green_button_sr), RGV.ding);
                 } else if (v.getId() == R.id.blue_button_sr) {
-                    playSound(RGV.dong);
-                    // when I click, it will animate
-                    RGV.animation = new AlphaAnimation(1, 0);
-                    RGV.animation.setDuration(300);
-                    RGV.animation.setInterpolator(new LinearInterpolator());
-                    findViewById(R.id.blue_button_sr).startAnimation(RGV.animation);
-                    //Log.i("PRESSED BLUE", "Blue");
+                    runAnimationAndPlaySound(findViewById(R.id.blue_button_sr), RGV.dong);
                 } else if (v.getId() == R.id.yellow_button_sr) {
-                    playSound(RGV.high_ding);
-                    // when I click, it will animate
-                    RGV.animation = new AlphaAnimation(1, 0);
-                    RGV.animation.setDuration(300);
-                    RGV.animation.setInterpolator(new LinearInterpolator());
-                    findViewById(R.id.yellow_button_sr).startAnimation(RGV.animation);
-                    //Log.i("PRESSED YELLOW", "Yellow");
+                    runAnimationAndPlaySound(findViewById(R.id.yellow_button_sr), RGV.high_ding);
                 }
 
                 RGV.numOfClicks++;
-
 
                 if (RGV.numOfBlocksToClick == RGV.numOfClicks) {
 
@@ -205,14 +179,14 @@ public class SimonRewindGame extends AppCompatActivity {
                         RGV.highestScoreText.setText("High score: " + RGV.highestScore);
                     }
 
-                    //RGV.numOfBlocksToClick++;
-
                     final Runnable runnable = new Runnable() {
                         public void run() {
                             playTurn();
                         }
                     };
-                    RGV.handler.postDelayed(runnable, 1000); // without, you can click the same button over and over again and not record your score!
+
+                    // without, you can click the same button over and over again and not record your score!
+                    RGV.handler.postDelayed(runnable, 1000);
                 }
             }
             return true;
@@ -220,40 +194,39 @@ public class SimonRewindGame extends AppCompatActivity {
     };
 
 
-    private int j;
-    private void playTurn() {
+    View.OnTouchListener nullTouchListener = new View.OnTouchListener() {
+        @Override
+        public boolean onTouch(View v, MotionEvent event){
+            return true;
+        }
+    };
 
-        enableButtons();
+
+    private void playTurn() {
+        //enableButtons();
         initializePlays();
 
         RGV.numOfBlocksToClick++;
 
-        // this is the computer creating the buttons
-        for (j = 0; j < RGV.numOfBlocksToClick; j++) {
-            final int newJ = j;
-            Log.i("J", "" + j);
+        disableButtons();
 
-            //Log.i("newJ", "" + newJ);
+        // this is the computer creating the button animations
+        for (int j = 0; j < RGV.numOfBlocksToClick; j++) {
+            final int newJ = j;
+
             Log.i("Num of Blocks to Click", "" + RGV.numOfBlocksToClick);
             final Runnable runnable = new Runnable() {
                 @Override
                 public void run() {
-
                     if (RGV.plays[newJ] == 1) {
                         runAnimationAndPlaySound(findViewById(R.id.red_button_sr), RGV.bell);
-                        //Toast.makeText(getApplicationContext(), "Red!", Toast.LENGTH_SHORT).show();
                     } else if (RGV.plays[newJ] == 2) {
-                        //playSound(RGV.ding);
                         runAnimationAndPlaySound(findViewById(R.id.green_button_sr),RGV.ding);
-                        //Toast.makeText(getApplicationContext(), "Green!", Toast.LENGTH_SHORT).show();
                     } else if (RGV.plays[newJ] == 3) {
                         //playSound(RGV.dong);
                         runAnimationAndPlaySound(findViewById(R.id.blue_button_sr),RGV.dong);
-                        //Toast.makeText(getApplicationContext(), "Blue!", Toast.LENGTH_SHORT).show();
                     } else if (RGV.plays[newJ] == 4) {
-                        //playSound(RGV.high_ding);
                         runAnimationAndPlaySound(findViewById(R.id.yellow_button_sr),RGV.high_ding);
-                        //Toast.makeText(getApplicationContext(), "Yellow!", Toast.LENGTH_SHORT).show();
                     }
                 }
 
@@ -266,53 +239,47 @@ public class SimonRewindGame extends AppCompatActivity {
     private void initializePlays() {
         for (int i = 0; i < 20; i++) {
             if (RGV.plays[i] == 0 || RGV.plays == null)  {
-                //plays[i] = random.nextInt(4);  // 0 - 3
                 RGV.plays[i] = RGV.random.nextInt(4) + 1;  // 1 -4
-                //Log.i("plays[]", "" + RGV.plays[i] + "\n");
-                //break; // need this so it goes back to the first button in order
             }
-        }
-        for (int i = 0; i < 20; i++) {
-            Log.i( "RGV.plays[i]: ","" + RGV.plays[i]);
         }
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-        RGV.audioFeatures.stopAudio();
+        stopAudio();
     }
 
     @Override
     protected void onStop() {
         super.onStop();
-        if(RGV.audioFeatures.mediaPlayer != null)
+        if(mediaPlayer != null)
         {
-            RGV.audioFeatures.mediaPlayer.release();
-            RGV.audioFeatures.mediaPlayer = null;
-            RGV.audioFeatures.mediaState = MainActivity.MediaState.NOT_READY;
+            mediaPlayer.release();
+            mediaPlayer = null;
+            mediaState = MainActivity.MediaState.NOT_READY;
         }
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        RGV.audioFeatures.playAudio();
+        playAudio();
     }
 
     class StartListener implements View.OnClickListener{
         @Override
         public void onClick(View view) {
-            RGV.audioFeatures.playAudio();
+            playAudio();
         }
     }
 
     class PauseListener implements View.OnClickListener{
         @Override
         public void onClick(View view) {
-            if(RGV.audioFeatures.mediaPlayer != null)  {
-                RGV.audioFeatures.mediaPlayer.pause();
-                RGV.audioFeatures.mediaState = MainActivity.MediaState.PAUSED;
+            if(mediaPlayer != null)  {
+                mediaPlayer.pause();
+                mediaState = MainActivity.MediaState.PAUSED;
             }
 
         }
@@ -320,9 +287,7 @@ public class SimonRewindGame extends AppCompatActivity {
 
     class StopListener implements View.OnClickListener{
         @Override
-        public void onClick(View view) {
-            RGV.audioFeatures.stopAudio();
-        }
+        public void onClick(View view) {  stopAudio(); }
     }
 
     private void playSound(int soundId) {
@@ -332,34 +297,49 @@ public class SimonRewindGame extends AppCompatActivity {
     }
 
     private void setOnTouchListeners() {
-        findViewById(R.id.red_button_sr).setOnTouchListener(touched);
-        findViewById(R.id.green_button_sr).setOnTouchListener(touched);
-        findViewById(R.id.blue_button_sr).setOnTouchListener(touched);
-        findViewById(R.id.yellow_button_sr).setOnTouchListener(touched);
+        findViewById(R.id.red_button_sr).setOnTouchListener(onTouchListener);
+        findViewById(R.id.green_button_sr).setOnTouchListener(onTouchListener);
+        findViewById(R.id.blue_button_sr).setOnTouchListener(onTouchListener);
+        findViewById(R.id.yellow_button_sr).setOnTouchListener(onTouchListener);
     }
 
     public void runAnimationAndPlaySound(View view, int sound) {
         playSound(sound);
 
-        //findViewById(R.id.blue_button).performClick();
         // when button auto clicks, it will animate
         RGV.animation.setDuration(300);
         RGV.animation.setInterpolator(new LinearInterpolator());
         view.startAnimation(RGV.animation);
     }
 
+    private void showRulesAlertDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(SimonRewindGame.this); // need a new one because of running activity
+        builder.setTitle("Simon Rewind");
+        //builder.setMessage("You lost :( \n Click 'Play again!' or 'home' to go back to home.");
+        builder.setMessage("Welcome to Simon Rewind!\n\n " +
+                "Your goal is to repeat the sequence of buttons in REVERSE order.\n\n" +
+                "Good luck!\n\n");
+
+        builder.setNegativeButton("LET'S PLAY!", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int choice) { }
+        });
+
+        AlertDialog dialog = builder.create();
+        dialog.show();
+        dialog.getWindow().setLayout(1100, 700);
+    }
+
     private void enableButtons() {
-        findViewById(R.id.red_button_sr).setEnabled(true);
-        findViewById(R.id.green_button_sr).setEnabled(true);
-        findViewById(R.id.blue_button_sr).setEnabled(true);
-        findViewById(R.id.yellow_button_sr).setEnabled(true);
+        setOnTouchListeners();
     }
 
     public void disableButtons() {
-        findViewById(R.id.red_button_sr).setEnabled(false);
-        findViewById(R.id.green_button_sr).setEnabled(false);
-        findViewById(R.id.blue_button_sr).setEnabled(false);
-        findViewById(R.id.yellow_button_sr).setEnabled(false);
+        //set all to null on touch listeners
+
+        findViewById(R.id.red_button_sr).setOnTouchListener(nullTouchListener);
+        findViewById(R.id.green_button_sr).setOnTouchListener(nullTouchListener);
+        findViewById(R.id.blue_button_sr).setOnTouchListener(nullTouchListener);
+        findViewById(R.id.yellow_button_sr).setOnTouchListener(nullTouchListener);
     }
 
     private void loadSoundPoolSounds() {
@@ -368,5 +348,44 @@ public class SimonRewindGame extends AppCompatActivity {
         RGV.dong = RGV.soundPool.load(this, R.raw.dong, 1);
         RGV.high_ding = RGV.soundPool.load(this, R.raw.high_ding, 1);
         RGV.lose = RGV.soundPool.load(this, R.raw.lose, 1);
+    }
+
+
+    public void playAudio() {
+        if(mediaPlayer == null) {
+            mediaState = MainActivity.MediaState.NOT_READY;
+            mediaPlayer = MediaPlayer.create(getApplicationContext(),R.raw.mushroom_theme_0);
+            mediaPlayer.setLooping(true);
+
+            mediaPlayer.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
+                @Override
+                public void onPrepared(MediaPlayer mediaPlayer) {
+                    Log.i("MEDIA", "------------ ready to play");
+                    mediaState = MainActivity.MediaState.PLAYING;
+                    mediaPlayer.start();
+                }
+            });
+
+            mediaPlayer.setOnErrorListener(new MediaPlayer.OnErrorListener() {
+                @Override
+                public boolean onError(MediaPlayer mediaPlayer, int i, int i1) {
+                    Log.i("MEDIA", "------------ problem playing sound");
+                    return false;
+                }
+            });
+        } else if(mediaState == MainActivity.MediaState.PAUSED) {
+            mediaPlayer.start();
+            mediaState = MainActivity.MediaState.PLAYING;
+        } else if(mediaState == MainActivity.MediaState.STOPPED) {
+            mediaPlayer.prepareAsync();
+            mediaState = MainActivity.MediaState.NOT_READY;
+        }
+    }
+
+    public void stopAudio() {
+        if(mediaPlayer != null) {
+            mediaPlayer.stop();
+            mediaState = MainActivity.MediaState.STOPPED;
+        }
     }
 }

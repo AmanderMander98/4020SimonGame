@@ -11,7 +11,6 @@ public class AudioFeatures {
     public Context context;
 
 
-
     public AudioFeatures(MediaPlayer mediaPlayer, MainActivity.MediaState mediaState, Context context) {
         this.mediaPlayer = mediaPlayer;
         this.mediaState = mediaState;
@@ -64,7 +63,4 @@ public class AudioFeatures {
         }
     }
 
-    public void setMediaState(MainActivity.MediaState ms) {
-        mediaState = ms;
-    }
 }

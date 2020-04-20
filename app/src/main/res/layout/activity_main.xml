@@ -26,7 +26,7 @@
                 android:paddingBottom="20px"
                 android:text="[ ORIGINAL ]"
                 android:textColor="#fff"
-                android:textSize="30sp"
+                android:textSize="28sp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/simonLogoNameImageView" />
@@ -41,7 +41,7 @@
                 android:paddingBottom="20px"
                 android:text="[ REWIND ]"
                 android:textColor="#fff"
-                android:textSize="30sp"
+                android:textSize="28sp"
                 app:layout_constraintBottom_toTopOf="@+id/about_button"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent" />
@@ -56,10 +56,9 @@
                 android:paddingBottom="20px"
                 android:text="[ ABOUT ]"
                 android:textColor="#fff"
-                android:textSize="30sp"
+                android:textSize="28sp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.485"
                 app:layout_constraintStart_toStartOf="parent" />
 
             <Button
@@ -70,9 +69,9 @@
                 android:fontFamily="monospace"
                 android:paddingTop="20px"
                 android:paddingBottom="20px"
-                android:text="⌈ Trickster ⌉\n⌊ (Surprise) ⌋"
+                android:text="[ Trickster/Surprise ]"
                 android:textColor="#fff"
-                android:textSize="30sp"
+                android:textSize="27sp"
                 app:layout_constraintBottom_toTopOf="@+id/simon_rewind_button_mainactivity"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
