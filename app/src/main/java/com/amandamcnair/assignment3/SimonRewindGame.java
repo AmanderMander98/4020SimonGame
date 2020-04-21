@@ -281,8 +281,8 @@ public class SimonRewindGame extends AppCompatActivity {
     @Override
     protected void onStop() {
         super.onStop();
-        if(mediaPlayer != null)
-        {
+        cancelTurn();
+        if(mediaPlayer != null) {
             mediaPlayer.release();
             mediaPlayer = null;
             mediaState = MainActivity.MediaState.NOT_READY;
@@ -513,11 +513,12 @@ public class SimonRewindGame extends AppCompatActivity {
     }
 
     private void gameOverAlertDialog() {
+        cancelTurn();
         Toast.makeText(getApplicationContext(), "GAME OVER!", Toast.LENGTH_SHORT).show();
         AlertDialog.Builder builder = new AlertDialog.Builder(SimonRewindGame.this); // need a new one because of running activity
         builder.setTitle("GAME OVER!");
         //builder.setMessage("You lost :( \n Click 'Play again!' or 'home' to go back to home.");
-        builder.setMessage("You lost :( \n Your score was " + RGV.score + "\nClick 'home' to go back to home.");
+        builder.setMessage("You lost on turn " + RGV.numOfBlocksToClick + ":( \n Your score was " + RGV.score + "\nClick 'home' to go back to home.");
 
         builder.setNegativeButton("HOME", new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int choice) {
