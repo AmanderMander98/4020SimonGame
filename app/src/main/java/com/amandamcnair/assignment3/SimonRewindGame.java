@@ -1,6 +1,7 @@
 package com.amandamcnair.assignment3;
 
 import android.app.AlertDialog;
+import android.os.Handler;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -9,6 +10,7 @@ import android.media.AudioAttributes;
 import android.media.MediaPlayer;
 import android.media.SoundPool;
 import android.os.Bundle;
+import android.os.Looper;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
@@ -30,6 +32,7 @@ public class SimonRewindGame extends AppCompatActivity {
     private GameValues RGV = new GameValues();
 
     private Timer timer;
+    private Handler buttonPressHandler;
     private View currentButton;
 
     @Override
@@ -118,10 +121,25 @@ public class SimonRewindGame extends AppCompatActivity {
                 //call for the button click task
                 currentButton = v;
 
-                if (timer == null) {
-                    timer = new Timer();
-                    timer.schedule(new ButtonClickTask(), 0, 1000);
-                }
+                // DONT WANT TIMER-- timer does the same thing on a schedule.
+                // we only want this to repeat when it's called again.
+
+                Thread t = new Thread() {
+                    @Override
+                    public void run() {
+                        Looper.prepare();
+                        buttonPressHandler = new Handler();
+                        buttonPressHandler.post(new ButtonClickTask());
+                        Looper.loop();
+                    }
+                };
+                t.start();
+
+
+                //if (timer == null) {
+                //    timer = new Timer();
+                //    timer.schedule(new ButtonClickTask(), 0, 1000);
+                //}
 
                 /*
                 // player clicking buttons
@@ -223,7 +241,7 @@ public class SimonRewindGame extends AppCompatActivity {
         //enableButtons();
         initializePlays();
 
-        //disableButtons();
+        disableButtons();
         final Runnable runnable = new Runnable() {
             @Override
             public void run() {
@@ -245,14 +263,13 @@ public class SimonRewindGame extends AppCompatActivity {
                     }
 
                     Log.i("RGV.plays[i] = " , "" + RGV.plays[newJ]);
-
                 }
             }
 
         };
 
-        enableButtons();
         RGV.handler.postDelayed(runnable, (1000));
+        enableButtons();
 
     }
 
@@ -320,7 +337,7 @@ public class SimonRewindGame extends AppCompatActivity {
 
 
 
-    class ButtonClickTask extends TimerTask {
+    class ButtonClickTask implements Runnable {
         private boolean rightButtonClicked = false;
         private boolean finishedTheRound = false;
         private boolean newHighScore = false;
@@ -398,16 +415,6 @@ public class SimonRewindGame extends AppCompatActivity {
                         editorSimonRewind.putInt("HIGHSCORESimonRewind", RGV.highestScore);
                         editorSimonRewind.commit();
                     }
-
-                    //was doing this twice
-                    //final Runnable runnable = new Runnable() {
-                    //    public void run() {
-                    //        playTurn();
-                    //    }
-                    //};
-
-                    // without, you can click the same button over and over again and not record your score!
-                    //RGV.handler.postDelayed(runnable, 1000);
                 }
             }
 
@@ -448,12 +455,9 @@ public class SimonRewindGame extends AppCompatActivity {
                         playTurn();
                     }
                 };
-
                 // without, you can click the same button over and over again and not record your score!
                 RGV.handler.postDelayed(runnable, 1000);
             }
-
-            //when done, set all booleans back to false
 
             try {
                 Thread.sleep(1000 * RGV.numOfBlocksToClick);
@@ -462,6 +466,7 @@ public class SimonRewindGame extends AppCompatActivity {
             }
 
             setAllBoolsToFalse();
+            //when done, set all booleans back to false
         }
 
         private void setAllBoolsToFalse() {
@@ -539,7 +544,6 @@ public class SimonRewindGame extends AppCompatActivity {
 
     public void disableButtons() {
         //set all to null on touch listeners
-
         findViewById(R.id.red_button_sr).setOnTouchListener(nullTouchListener);
         findViewById(R.id.green_button_sr).setOnTouchListener(nullTouchListener);
         findViewById(R.id.blue_button_sr).setOnTouchListener(nullTouchListener);
