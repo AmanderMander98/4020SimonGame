@@ -16,7 +16,7 @@ public class GameValues {
     public TextView scoreText;
     public TextView highestScoreText;
     public int buttonClick;
-    public int numOfBlocksToClick = 0;
+    public int numOfBlocksToClick = 1;
     public int numOfClicks = 0;
 
     public int plays[] = new int[20];

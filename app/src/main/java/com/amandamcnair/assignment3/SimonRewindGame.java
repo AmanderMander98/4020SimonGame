@@ -102,6 +102,14 @@ public class SimonRewindGame extends AppCompatActivity {
         showRulesAlertDialog();
     }
 
+
+    View.OnTouchListener nullTouchListener = new View.OnTouchListener() {
+        @Override
+        public boolean onTouch(View v, MotionEvent event){
+            return true;
+        }
+    };
+
     View.OnTouchListener onTouchListener = new View.OnTouchListener() {
         @Override
         public boolean onTouch(View v, MotionEvent event) {
@@ -211,27 +219,16 @@ public class SimonRewindGame extends AppCompatActivity {
     };
 
 
-    View.OnTouchListener nullTouchListener = new View.OnTouchListener() {
-        @Override
-        public boolean onTouch(View v, MotionEvent event){
-            return true;
-        }
-    };
-
-
     private void playTurn() {
         //enableButtons();
         initializePlays();
 
-        RGV.numOfBlocksToClick++;
-
-        disableButtons();
-
+        //disableButtons();
         final Runnable runnable = new Runnable() {
             @Override
             public void run() {
-
-            // this is the computer creating the button animations
+                //RGV.numOfBlocksToClick++;
+                // this is the computer creating the button animations
                 for (int j = 0; j < RGV.numOfBlocksToClick; j++) {
                     final int newJ = j;
                     Log.i("Num of Blocks to Click", "" + RGV.numOfBlocksToClick);
@@ -249,22 +246,14 @@ public class SimonRewindGame extends AppCompatActivity {
 
                     Log.i("RGV.plays[i] = " , "" + RGV.plays[newJ]);
 
-                            /*
-                            try {
-                                Thread.sleep(1000);
-                            } catch (InterruptedException e) {
-                                e.printStackTrace();
-                            }
-                             */
                 }
-
             }
 
         };
 
-        RGV.handler.postDelayed(runnable, (1000 * RGV.numOfBlocksToClick));
-
         enableButtons();
+        RGV.handler.postDelayed(runnable, (1000));
+
     }
 
     private void initializePlays() {
@@ -329,13 +318,15 @@ public class SimonRewindGame extends AppCompatActivity {
         public void onClick(View view) {  stopAudio(); }
     }
 
-    private boolean rightButtonClicked = false;
-    private boolean finishedTheRound = false;
-    private boolean newHighScore = false;
-    private int buttonToAnimate;
-    private int soundToPlay;
+
 
     class ButtonClickTask extends TimerTask {
+        private boolean rightButtonClicked = false;
+        private boolean finishedTheRound = false;
+        private boolean newHighScore = false;
+
+        private int buttonToAnimate;
+        private int soundToPlay;
 
         @Override
         public void run() {
@@ -358,18 +349,16 @@ public class SimonRewindGame extends AppCompatActivity {
             }
 
             if (RGV.plays[(RGV.score - RGV.numOfClicks)] != RGV.buttonClick) {
-
+                Log.i("Player lost.", "");
                 rightButtonClicked = false;
 
                 cancelTurn();
                 playSound(RGV.lose);
                 disableButtons();
+                //break;
 
             } else {
                 rightButtonClicked = true;
-
-                //runAnimationAndPlaySound(findViewById(buttonToAnimate),soundToPlay);
-                RGV.numOfClicks++;
 
                 if (currentButton.getId() == R.id.red_button_sr) {
                     buttonToAnimate =  R.id.red_button_sr;
@@ -388,6 +377,7 @@ public class SimonRewindGame extends AppCompatActivity {
                     soundToPlay = RGV.high_ding;
                 }
 
+                RGV.numOfClicks++;
                 runAnimationAndPlaySound(findViewById(buttonToAnimate),soundToPlay);
 
                 if (RGV.numOfBlocksToClick == RGV.numOfClicks) {
@@ -395,28 +385,37 @@ public class SimonRewindGame extends AppCompatActivity {
 
                     RGV.score++;
                     RGV.numOfClicks = 0;
+                    disableButtons();
 
                     if (RGV.numOfBlocksToClick > RGV.highestScore) {
                         newHighScore = true;
                         RGV.highestScore = RGV.numOfBlocksToClick;
 
                         // green stuff cannot be the same in another class                 // right here below
-                        SharedPreferences highScoresSimonRewind = getSharedPreferences("HIGHSCOREsimonRewind", Context.MODE_PRIVATE);
+                        SharedPreferences highScoresSimonRewind = getSharedPreferences("HIGHSCORESimonRewind", Context.MODE_PRIVATE);
                         SharedPreferences.Editor editorSimonRewind = highScoresSimonRewind.edit();
                         // right here below
-                        editorSimonRewind.putInt("HIGHSCOREsimonRewind", RGV.highestScore);
+                        editorSimonRewind.putInt("HIGHSCORESimonRewind", RGV.highestScore);
                         editorSimonRewind.commit();
                     }
 
-                    final Runnable runnable = new Runnable() {
-                        public void run() {
-                            playTurn();
-                        }
-                    };
+                    //was doing this twice
+                    //final Runnable runnable = new Runnable() {
+                    //    public void run() {
+                    //        playTurn();
+                    //    }
+                    //};
+
                     // without, you can click the same button over and over again and not record your score!
-                    RGV.handler.postDelayed(runnable, 1000);
+                    //RGV.handler.postDelayed(runnable, 1000);
                 }
             }
+
+
+            Log.i("Button clicked: ",  "" + RGV.buttonClick);
+            Log.i("Right button clicked: ",  "" + rightButtonClicked);
+            Log.i("Finished the round: ",  "" + finishedTheRound);
+            Log.i("New high score: ",  "" + newHighScore);
 
             runOnUiThread(new Runnable() {
                 @Override
@@ -439,9 +438,11 @@ public class SimonRewindGame extends AppCompatActivity {
                         }
                     }
                 }
+
             });
 
             if (finishedTheRound) {
+                RGV.numOfBlocksToClick++;
                 final Runnable runnable = new Runnable() {
                     public void run() {
                         playTurn();
@@ -453,8 +454,14 @@ public class SimonRewindGame extends AppCompatActivity {
             }
 
             //when done, set all booleans back to false
-            setAllBoolsToFalse();
 
+            try {
+                Thread.sleep(1000 * RGV.numOfBlocksToClick);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+
+            setAllBoolsToFalse();
         }
 
         private void setAllBoolsToFalse() {
@@ -462,6 +469,7 @@ public class SimonRewindGame extends AppCompatActivity {
             finishedTheRound = false;
             newHighScore = false;
         }
+
     }
 
 
