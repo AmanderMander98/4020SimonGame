@@ -24,7 +24,7 @@ public class GameValues {
     public int score = 0;
     public int highestScore = 0;
     public Random random = new Random();
-    public final Handler handler = new Handler();
+    public final Handler animationHandler = new Handler();
 
     public SoundPool soundPool;
     public Set<Integer> soundsLoaded;

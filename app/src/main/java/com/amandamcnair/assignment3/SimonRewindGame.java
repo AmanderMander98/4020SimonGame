@@ -22,7 +22,6 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import java.util.HashSet;
 import java.util.Timer;
-import java.util.TimerTask;
 
 public class SimonRewindGame extends AppCompatActivity {
 
@@ -134,102 +133,6 @@ public class SimonRewindGame extends AppCompatActivity {
                     }
                 };
                 t.start();
-
-
-                //if (timer == null) {
-                //    timer = new Timer();
-                //    timer.schedule(new ButtonClickTask(), 0, 1000);
-                //}
-
-                /*
-                // player clicking buttons
-                switch (v.getId()) {
-                    case R.id.red_button_sr:
-                        RGV.buttonClick = 1;
-                        playSound(RGV.bell);
-                        break;
-                    case R.id.green_button_sr:
-                        RGV.buttonClick = 2;
-                        break;
-                    case R.id.blue_button_sr:
-                        RGV.buttonClick = 3;
-                        break;
-                    case R.id.yellow_button_sr:
-                        RGV.buttonClick = 4;
-                        break;
-                }
-
-                // if player clicks wrong button, he/she loses
-                if (RGV.plays[(RGV.score - RGV.numOfClicks)] != RGV.buttonClick) {
-                    playSound(RGV.lose);
-                    disableButtons();
-
-                    findViewById(R.id.start_button_sr).setEnabled(true);
-
-                    Toast.makeText(getApplicationContext(), "GAME OVER!", Toast.LENGTH_SHORT).show();
-                    AlertDialog.Builder builder = new AlertDialog.Builder(SimonRewindGame.this); // need a new one because of running activity
-                    builder.setTitle("GAME OVER!");
-                    //builder.setMessage("You lost :( \n Click 'Play again!' or 'home' to go back to home.");
-                    builder.setMessage("You lost :( \n Your score was " + RGV.score + "\nClick 'home' to go back to home.");
-
-                    builder.setNegativeButton("HOME", new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int choice) {
-                            // Dismiss Dialog
-                            Intent i = new Intent(getApplicationContext(), MainActivity.class);
-                            getApplicationContext().startActivity(i);
-                        }
-                    });
-
-                    AlertDialog dialog = builder.create();
-                    dialog.show();
-                    dialog.getWindow().setLayout(1100, 600);
-
-                    return true;
-                }
-
-
-                //if the user gets its right
-                if (v.getId() == R.id.red_button_sr) {
-                    runAnimationAndPlaySound(findViewById(R.id.red_button_sr), RGV.bell);
-                } else if (v.getId() == R.id.green_button_sr) {
-                    runAnimationAndPlaySound(findViewById(R.id.green_button_sr), RGV.ding);
-                } else if (v.getId() == R.id.blue_button_sr) {
-                    runAnimationAndPlaySound(findViewById(R.id.blue_button_sr), RGV.dong);
-                } else if (v.getId() == R.id.yellow_button_sr) {
-                    runAnimationAndPlaySound(findViewById(R.id.yellow_button_sr), RGV.high_ding);
-                }
-
-                RGV.numOfClicks++;
-
-                if (RGV.numOfBlocksToClick == RGV.numOfClicks) {
-
-                    RGV.score++;
-                    RGV.scoreText.setText("Score: " + RGV.score);
-
-                    RGV.numOfClicks = 0;
-                    if (RGV.numOfBlocksToClick > RGV.highestScore) {
-                        RGV.highestScore = RGV.numOfBlocksToClick;
-                        // green stuff cannot be the same in another class                 // right here below
-                        SharedPreferences highScoresSimonRewind = getSharedPreferences("HIGHSCOREsimonOriginal", Context.MODE_PRIVATE);
-                        SharedPreferences.Editor editorSimonRewind = highScoresSimonRewind.edit();
-                        // right here below
-                        editorSimonRewind.putInt("HIGHSCOREsimonOriginal", RGV.highestScore);
-                        editorSimonRewind.commit();
-
-                        RGV.highestScoreText.setText("High score: " + RGV.highestScore);
-                    }
-
-                    final Runnable runnable = new Runnable() {
-                        public void run() {
-                            playTurn();
-                        }
-                    };
-
-                    // without, you can click the same button over and over again and not record your score!
-                    RGV.handler.postDelayed(runnable, 1000);
-                }
-
-                 */
             }
 
             return true;
@@ -242,33 +145,34 @@ public class SimonRewindGame extends AppCompatActivity {
         initializePlays();
 
         disableButtons();
-        final Runnable runnable = new Runnable() {
-            @Override
-            public void run() {
-                //RGV.numOfBlocksToClick++;
-                // this is the computer creating the button animations
-                for (int j = 0; j < RGV.numOfBlocksToClick; j++) {
-                    final int newJ = j;
-                    Log.i("Num of Blocks to Click", "" + RGV.numOfBlocksToClick);
 
-                    if (RGV.plays[newJ] == 1) {
-                        runAnimationAndPlaySound(findViewById(R.id.red_button_sr), RGV.bell);
-                    } else if (RGV.plays[newJ] == 2) {
-                        runAnimationAndPlaySound(findViewById(R.id.green_button_sr),RGV.ding);
-                    } else if (RGV.plays[newJ] == 3) {
-                        //playSound(RGV.dong);
-                        runAnimationAndPlaySound(findViewById(R.id.blue_button_sr),RGV.dong);
-                    } else if (RGV.plays[newJ] == 4) {
-                        runAnimationAndPlaySound(findViewById(R.id.yellow_button_sr),RGV.high_ding);
-                    }
+        for (int j = 0; j < RGV.numOfBlocksToClick; j++) {
+            final int newJ = j;
+            final Runnable runnable = new Runnable() {
+                @Override
+                public void run() {
+                    // this is the computer creating the button animations
 
-                    Log.i("RGV.plays[i] = " , "" + RGV.plays[newJ]);
+                        Log.i("Num of Blocks to Click", "" + RGV.numOfBlocksToClick);
+
+                        if (RGV.plays[newJ] == 1) {
+                            runAnimationAndPlaySound(findViewById(R.id.red_button_sr), RGV.bell);
+                        } else if (RGV.plays[newJ] == 2) {
+                            runAnimationAndPlaySound(findViewById(R.id.green_button_sr),RGV.ding);
+                        } else if (RGV.plays[newJ] == 3) {
+                            runAnimationAndPlaySound(findViewById(R.id.blue_button_sr),RGV.dong);
+                        } else if (RGV.plays[newJ] == 4) {
+                            runAnimationAndPlaySound(findViewById(R.id.yellow_button_sr),RGV.high_ding);
+                        }
+
+                        Log.i("RGV.plays[i] = " , "" + RGV.plays[newJ]);
                 }
-            }
+            };
 
-        };
+            RGV.animationHandler.postDelayed(runnable, (1000) * j);
+        }
 
-        RGV.handler.postDelayed(runnable, (1000));
+
         enableButtons();
 
     }
@@ -445,7 +349,6 @@ public class SimonRewindGame extends AppCompatActivity {
                         }
                     }
                 }
-
             });
 
             if (finishedTheRound) {
@@ -456,7 +359,7 @@ public class SimonRewindGame extends AppCompatActivity {
                     }
                 };
                 // without, you can click the same button over and over again and not record your score!
-                RGV.handler.postDelayed(runnable, 1000);
+                RGV.animationHandler.postDelayed(runnable, 1000);
             }
 
             try {
