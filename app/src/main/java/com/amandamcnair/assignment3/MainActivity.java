@@ -165,7 +165,6 @@ public class MainActivity extends AppCompatActivity {
         {
             mediaPlayer.stop();
             mediaState = MediaState.STOPPED;
-
         }
     }
 }
