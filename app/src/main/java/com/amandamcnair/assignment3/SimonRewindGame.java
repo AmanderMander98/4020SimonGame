@@ -27,6 +27,7 @@ public class SimonRewindGame extends AppCompatActivity {
 
     //still not sure im going to end up using this boolean
     private boolean animationIsRunning = false;
+    private boolean buttonClickedForThisRound = false;
 
     private GameValues RGV = new GameValues();
 
@@ -89,7 +90,11 @@ public class SimonRewindGame extends AppCompatActivity {
         findViewById(R.id.start_button_sr).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                playTurn();
+                try {
+                    playAnimation();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
                 findViewById(R.id.start_button_sr).setEnabled(false);
                 Toast.makeText(getApplicationContext(), "Game has begun!", Toast.LENGTH_SHORT).show();
 
@@ -111,8 +116,10 @@ public class SimonRewindGame extends AppCompatActivity {
     View.OnTouchListener onTouchListener = new View.OnTouchListener() {
         @Override
         public boolean onTouch(View v, MotionEvent event) {
-            if (event.getAction() == MotionEvent.ACTION_DOWN) {
+            if (event.getAction() == MotionEvent.ACTION_DOWN &&
+                !animationIsRunning && !buttonClickedForThisRound) {
 
+                buttonClickedForThisRound = true;
                 //call for the button click task
                 RGV.currentButton = v;
 
@@ -131,56 +138,77 @@ public class SimonRewindGame extends AppCompatActivity {
 
                 t.start();
 
-                while (animationIsRunning) {
-                    disableButtons();
-                    try {
-                        t.sleep(1000 * (RGV.numOfBlocksToClick + 1));
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                }
-
-                //after it's done running, enable buttons again
-                enableButtons();
             }
+
+            Log.i("animationIsRunning onTouch: ","" + animationIsRunning);
             return true;
         }
     };
 
 
-    private void playTurn() {
-        initializePlays();
-        disableButtons();
-        animationIsRunning = true;
+    private void playAnimation() throws InterruptedException {
 
-        for (int j = 0; j < RGV.numOfBlocksToClick; j++) {
-            final int newJ = j;
-            final Runnable runnable = new Runnable() {
+        //runnablePre will be fully fledged when the button has NOT been clicked for this round
+        //and null when it has.
+
+        Runnable runnable;
+
+        if (!buttonClickedForThisRound) {
+            initializePlays();
+            animationIsRunning = true;
+            Log.i("animationIsRunning bf playAnimation: ", "" + animationIsRunning);
+
+            runnable = new Runnable() {
                 @Override
                 public void run() {
-                    // this is the computer creating the button animations
 
+                    for (int j = 0; j < RGV.numOfBlocksToClick; j++) {
+                        final int newJ = j;
+                        // this is the computer creating the button animations
                         Log.i("Num of Blocks to Click", "" + RGV.numOfBlocksToClick);
 
+                        //runOnUiThread(new Runn);
                         if (RGV.plays[newJ] == 1) {
                             runAnimationAndPlaySound(findViewById(R.id.red_button_sr), RGV.bell);
                         } else if (RGV.plays[newJ] == 2) {
-                            runAnimationAndPlaySound(findViewById(R.id.green_button_sr),RGV.ding);
+                            runAnimationAndPlaySound(findViewById(R.id.green_button_sr), RGV.ding);
                         } else if (RGV.plays[newJ] == 3) {
-                            runAnimationAndPlaySound(findViewById(R.id.blue_button_sr),RGV.dong);
+                            runAnimationAndPlaySound(findViewById(R.id.blue_button_sr), RGV.dong);
                         } else if (RGV.plays[newJ] == 4) {
-                            runAnimationAndPlaySound(findViewById(R.id.yellow_button_sr),RGV.high_ding);
+                            runAnimationAndPlaySound(findViewById(R.id.yellow_button_sr), RGV.high_ding);
                         }
 
-                        Log.i("RGV.plays[i] = " , "" + RGV.plays[newJ]);
+                        Log.i("RGV.plays[i] = ", "" + RGV.plays[newJ]);
+
+
+                        try {
+                            Thread.sleep(2000);
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+                    }
                 }
             };
 
-            RGV.animationHandler.postDelayed(runnable, (1000) * j);
+        } else {
+            //do nothing with the runnable
+            runnable = new Runnable() {
+                @Override
+                public void run() {
+                    //disable
+                }
+            };
+
         }
 
+        //final Runnable runnable = new Runnable(runnablePre);
+        //RGV.animationHandler.post(runnable);
+        new Thread(runnable).start();
+
         animationIsRunning = false;
-        enableButtons();
+        Log.i("animationIsRunning aft playAnimation: ", "" + animationIsRunning);
+        //enableButtons();
+
     }
 
     private void initializePlays() {
@@ -361,18 +389,25 @@ public class SimonRewindGame extends AppCompatActivity {
                 RGV.numOfBlocksToClick++;
                 final Runnable runnable = new Runnable() {
                     public void run() {
-                        playTurn();
+                        try {
+                            playAnimation();
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
                     }
                 };
                 // without, you can click the same button over and over again and not record your score!
-                RGV.animationHandler.postDelayed(runnable, 1000);
+                //RGV.animationHandler.postDelayed(runnable, 1000);
+                new Thread(runnable).start();
             }
 
-            try {
-                Thread.sleep(1000 * RGV.numOfBlocksToClick);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+            //try {
+            //    Thread.sleep(1000 * RGV.numOfBlocksToClick);
+            //} catch (InterruptedException e) {
+            //    e.printStackTrace();
+            //}
+
+            buttonClickedForThisRound = false;
 
             setAllBoolsToFalse();
             //when done, set all booleans back to false
@@ -393,15 +428,17 @@ public class SimonRewindGame extends AppCompatActivity {
     }
 
     private void setOnTouchListeners() {
-        findViewById(R.id.red_button_sr).setEnabled(true);
-        findViewById(R.id.green_button_sr).setEnabled(true);
-        findViewById(R.id.blue_button_sr).setEnabled(true);
-        findViewById(R.id.yellow_button_sr).setEnabled(true);
 
         findViewById(R.id.red_button_sr).setOnTouchListener(onTouchListener);
         findViewById(R.id.green_button_sr).setOnTouchListener(onTouchListener);
         findViewById(R.id.blue_button_sr).setOnTouchListener(onTouchListener);
         findViewById(R.id.yellow_button_sr).setOnTouchListener(onTouchListener);
+
+
+        findViewById(R.id.red_button_sr).setEnabled(true);
+        findViewById(R.id.green_button_sr).setEnabled(true);
+        findViewById(R.id.blue_button_sr).setEnabled(true);
+        findViewById(R.id.yellow_button_sr).setEnabled(true);
     }
 
     public void runAnimationAndPlaySound(View view, int sound) {
@@ -452,23 +489,23 @@ public class SimonRewindGame extends AppCompatActivity {
     }
 
     private void enableButtons() {
+        Log.i("Buttons: ", "enabled");
         setOnTouchListeners();
     }
 
     public void disableButtons() {
         //set all to null on touch listeners
-        findViewById(R.id.red_button_sr).setEnabled(false);
-        findViewById(R.id.green_button_sr).setEnabled(false);
-        findViewById(R.id.blue_button_sr).setEnabled(false);
-        findViewById(R.id.yellow_button_sr).setEnabled(false);
+        Log.i("Buttons: ", "disabled");
 
-        /*
         findViewById(R.id.red_button_sr).setOnTouchListener(nullTouchListener);
         findViewById(R.id.green_button_sr).setOnTouchListener(nullTouchListener);
         findViewById(R.id.blue_button_sr).setOnTouchListener(nullTouchListener);
         findViewById(R.id.yellow_button_sr).setOnTouchListener(nullTouchListener);
 
-         */
+        findViewById(R.id.red_button_sr).setEnabled(false);
+        findViewById(R.id.green_button_sr).setEnabled(false);
+        findViewById(R.id.blue_button_sr).setEnabled(false);
+        findViewById(R.id.yellow_button_sr).setEnabled(false);
     }
 
     private void loadSoundPoolSounds() {
