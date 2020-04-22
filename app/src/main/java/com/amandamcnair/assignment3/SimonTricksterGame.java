@@ -383,8 +383,7 @@ public class SimonTricksterGame extends AppCompatActivity {
     class PauseListener implements View.OnClickListener{
         @Override
         public void onClick(View view) {
-            if(mediaPlayer != null)
-            {
+            if(mediaPlayer != null) {
                 mediaPlayer.pause();
                 mediaState = MainActivity.MediaState.PAUSED;
             }

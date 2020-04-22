@@ -2,6 +2,7 @@ package com.amandamcnair.assignment3;
 
 import android.media.SoundPool;
 import android.os.Handler;
+import android.view.View;
 import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
 import android.widget.TextView;
@@ -25,6 +26,10 @@ public class GameValues {
     public int highestScore = 0;
     public Random random = new Random();
     public final Handler animationHandler = new Handler();
+
+
+    public Handler buttonPressHandler;
+    public View currentButton;
 
     public SoundPool soundPool;
     public Set<Integer> soundsLoaded;

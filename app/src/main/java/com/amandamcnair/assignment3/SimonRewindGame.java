@@ -17,22 +17,18 @@ import android.view.View;
 import android.view.animation.LinearInterpolator;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import androidx.appcompat.app.AppCompatActivity;
-
 import java.util.HashSet;
-import java.util.Timer;
 
 public class SimonRewindGame extends AppCompatActivity {
 
     public MainActivity.MediaState mediaState;
     public MediaPlayer mediaPlayer;
 
-    private GameValues RGV = new GameValues();
+    //still not sure im going to end up using this boolean
+    private boolean animationIsRunning = false;
 
-    private Timer timer;
-    private Handler buttonPressHandler;
-    private View currentButton;
+    private GameValues RGV = new GameValues();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -118,7 +114,7 @@ public class SimonRewindGame extends AppCompatActivity {
             if (event.getAction() == MotionEvent.ACTION_DOWN) {
 
                 //call for the button click task
-                currentButton = v;
+                RGV.currentButton = v;
 
                 // DONT WANT TIMER-- timer does the same thing on a schedule.
                 // we only want this to repeat when it's called again.
@@ -127,24 +123,35 @@ public class SimonRewindGame extends AppCompatActivity {
                     @Override
                     public void run() {
                         Looper.prepare();
-                        buttonPressHandler = new Handler();
-                        buttonPressHandler.post(new ButtonClickTask());
+                        RGV.buttonPressHandler = new Handler();
+                        RGV.buttonPressHandler.post(new ButtonClickTask());
                         Looper.loop();
                     }
                 };
-                t.start();
-            }
 
+                t.start();
+
+                while (animationIsRunning) {
+                    disableButtons();
+                    try {
+                        t.sleep(1000 * (RGV.numOfBlocksToClick + 1));
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+
+                //after it's done running, enable buttons again
+                enableButtons();
+            }
             return true;
         }
     };
 
 
     private void playTurn() {
-        //enableButtons();
         initializePlays();
-
         disableButtons();
+        animationIsRunning = true;
 
         for (int j = 0; j < RGV.numOfBlocksToClick; j++) {
             final int newJ = j;
@@ -172,9 +179,8 @@ public class SimonRewindGame extends AppCompatActivity {
             RGV.animationHandler.postDelayed(runnable, (1000) * j);
         }
 
-
+        animationIsRunning = false;
         enableButtons();
-
     }
 
     private void initializePlays() {
@@ -193,9 +199,9 @@ public class SimonRewindGame extends AppCompatActivity {
     }
 
     private void cancelTurn() {
-        if (timer != null) {
-            timer.cancel();
-            timer = null;
+        if (RGV.buttonPressHandler != null) {
+            //buttonPressHandler.;
+            RGV.buttonPressHandler = null;
         }
     }
 
@@ -253,7 +259,7 @@ public class SimonRewindGame extends AppCompatActivity {
         public void run() {
 
             //do the ontouchlistener stuff
-            switch (currentButton.getId()) {
+            switch (RGV.currentButton.getId()) {
                 case R.id.red_button_sr:
                     RGV.buttonClick = 1;
                     //playSound(RGV.bell);
@@ -281,18 +287,18 @@ public class SimonRewindGame extends AppCompatActivity {
             } else {
                 rightButtonClicked = true;
 
-                if (currentButton.getId() == R.id.red_button_sr) {
+                if (RGV.currentButton.getId() == R.id.red_button_sr) {
                     buttonToAnimate =  R.id.red_button_sr;
                     soundToPlay = RGV.bell;
-                } else if (currentButton.getId() == R.id.green_button_sr) {
+                } else if (RGV.currentButton.getId() == R.id.green_button_sr) {
                     //runAnimationAndPlaySound(findViewById(R.id.green_button_sr), RGV.ding);
                     buttonToAnimate =  R.id.green_button_sr;
                     soundToPlay = RGV.ding;
-                } else if (currentButton.getId() == R.id.blue_button_sr) {
+                } else if (RGV.currentButton.getId() == R.id.blue_button_sr) {
                     //runAnimationAndPlaySound(findViewById(R.id.blue_button_sr), RGV.dong);
                     buttonToAnimate =  R.id.blue_button_sr;
                     soundToPlay = RGV.dong;
-                } else if (currentButton.getId() == R.id.yellow_button_sr) {
+                } else if (RGV.currentButton.getId() == R.id.yellow_button_sr) {
                     //runAnimationAndPlaySound(findViewById(R.id.yellow_button_sr), RGV.high_ding);
                     buttonToAnimate =  R.id.yellow_button_sr;
                     soundToPlay = RGV.high_ding;
@@ -377,7 +383,6 @@ public class SimonRewindGame extends AppCompatActivity {
             finishedTheRound = false;
             newHighScore = false;
         }
-
     }
 
 
@@ -388,6 +393,11 @@ public class SimonRewindGame extends AppCompatActivity {
     }
 
     private void setOnTouchListeners() {
+        findViewById(R.id.red_button_sr).setEnabled(true);
+        findViewById(R.id.green_button_sr).setEnabled(true);
+        findViewById(R.id.blue_button_sr).setEnabled(true);
+        findViewById(R.id.yellow_button_sr).setEnabled(true);
+
         findViewById(R.id.red_button_sr).setOnTouchListener(onTouchListener);
         findViewById(R.id.green_button_sr).setOnTouchListener(onTouchListener);
         findViewById(R.id.blue_button_sr).setOnTouchListener(onTouchListener);
@@ -426,7 +436,7 @@ public class SimonRewindGame extends AppCompatActivity {
         AlertDialog.Builder builder = new AlertDialog.Builder(SimonRewindGame.this); // need a new one because of running activity
         builder.setTitle("GAME OVER!");
         //builder.setMessage("You lost :( \n Click 'Play again!' or 'home' to go back to home.");
-        builder.setMessage("You lost on turn " + RGV.numOfBlocksToClick + ":( \n Your score was " + RGV.score + "\nClick 'home' to go back to home.");
+        builder.setMessage("You lost :( \n Your score was " + RGV.score + "\nClick 'home' to go back to home.");
 
         builder.setNegativeButton("HOME", new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int choice) {
@@ -447,10 +457,18 @@ public class SimonRewindGame extends AppCompatActivity {
 
     public void disableButtons() {
         //set all to null on touch listeners
+        findViewById(R.id.red_button_sr).setEnabled(false);
+        findViewById(R.id.green_button_sr).setEnabled(false);
+        findViewById(R.id.blue_button_sr).setEnabled(false);
+        findViewById(R.id.yellow_button_sr).setEnabled(false);
+
+        /*
         findViewById(R.id.red_button_sr).setOnTouchListener(nullTouchListener);
         findViewById(R.id.green_button_sr).setOnTouchListener(nullTouchListener);
         findViewById(R.id.blue_button_sr).setOnTouchListener(nullTouchListener);
         findViewById(R.id.yellow_button_sr).setOnTouchListener(nullTouchListener);
+
+         */
     }
 
     private void loadSoundPoolSounds() {
@@ -484,6 +502,7 @@ public class SimonRewindGame extends AppCompatActivity {
                     return false;
                 }
             });
+
         } else if(mediaState == MainActivity.MediaState.PAUSED) {
             mediaPlayer.start();
             mediaState = MainActivity.MediaState.PLAYING;
