@@ -27,6 +27,8 @@ public class GameValues {
     public Random random = new Random();
     public final Handler animationHandler = new Handler();
 
+    public boolean animationIsRunning = false;
+    public boolean buttonClickedForThisRound = false;
 
     public Handler buttonPressHandler;
     public View currentButton;

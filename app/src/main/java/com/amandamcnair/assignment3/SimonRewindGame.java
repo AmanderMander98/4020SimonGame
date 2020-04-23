@@ -28,8 +28,6 @@ public class SimonRewindGame extends AppCompatActivity {
     public MediaPlayer mediaPlayer;
 
     //still not sure im going to end up using this boolean
-    private boolean animationIsRunning = false;
-    private boolean buttonClickedForThisRound = false;
 
     private GameValues RGV = new GameValues();
 
@@ -92,11 +90,11 @@ public class SimonRewindGame extends AppCompatActivity {
         findViewById(R.id.start_button_sr).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                try {
+                //try {
                     playAnimation();
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
+                //} catch (InterruptedException e) {
+                    //e.printStackTrace();
+                //}
                 findViewById(R.id.start_button_sr).setEnabled(false);
                 Toast.makeText(getApplicationContext(), "Game has begun!", Toast.LENGTH_SHORT).show();
 
@@ -115,53 +113,15 @@ public class SimonRewindGame extends AppCompatActivity {
         }
     };
 
-    /*
-    View.OnTouchListener onTouchListener = new View.OnTouchListener() {
-        @Override
-        public boolean onTouch(View v, MotionEvent event) {
-            Log.i("OnTouchListener", "animationIsRunning: " + animationIsRunning + " v.id = " + v.getId() );
-            if (event.getAction() == MotionEvent.ACTION_DOWN &&
-                    !animationIsRunning
-                    //&& !buttonClickedForThisRound
-
-            ) {
-
-                Log.i("OnTouchListener", "currentButton: " + RGV.currentButton);
-                buttonClickedForThisRound = true;
-                //call for the button click task
-                RGV.currentButton = v;
-
-                // DONT WANT TIMER-- timer does the same thing on a schedule.
-                // we only want this to repeat when it's called again.
-
-                Thread t = new Thread() {
-                    @Override
-                    public void run() {
-                        Looper.prepare();
-                        RGV.buttonPressHandler = new Handler();
-                        RGV.buttonPressHandler.post(new ButtonClickTask());
-                        Looper.loop();
-                    }
-                };
-
-                t.start();
-
-            }
-
-            return true;
-        }
-    };
-    */
-
     View.OnClickListener onClick = new View.OnClickListener() {
         @Override
         public void onClick(View view) {
-            Log.i("OnClickListener", "animationIsRunning: " + animationIsRunning + " v.id = " + view.getId() );
-            if(!animationIsRunning) {
+            Log.i("OnClickListener", "animationIsRunning: " + RGV.animationIsRunning + " v.id = " + view.getId() );
+            if(!RGV.animationIsRunning) {
 
                 RGV.currentButton = view;
                 Log.i("OnClickListener", "currentButton: " + RGV.currentButton);
-                buttonClickedForThisRound = true;
+                RGV.buttonClickedForThisRound = true;
                 //call for the button click task
 
 
@@ -183,23 +143,19 @@ public class SimonRewindGame extends AppCompatActivity {
         }
     };
 
-    private void playAnimation() throws InterruptedException {
+    private void playAnimation() {
+        //Runnable runnable;
 
-        //runnablePre will be fully fledged when the button has NOT been clicked for this round
-        //and null when it has.
-
-        Runnable runnable;
-
-        if (!buttonClickedForThisRound) {
+        if (!RGV.buttonClickedForThisRound) {
             initializePlays();
-            animationIsRunning = true;
-            Log.i("animationIsRunning bf playAnimation: ", "" + animationIsRunning);
+            RGV.animationIsRunning = true;
 
-            runnable = new Runnable() {
+            final Runnable runnable = new Runnable() {
                 @Override
                 public void run() {
 
                     try {
+                        Thread.sleep(750);
                         for (int j = 0; j < RGV.numOfBlocksToClick; j++) {
                             // this is the computer creating the button animations
                             Log.i("Loop start", "j = " + j + " RGV.numOfBlocksToClick = " + RGV.numOfBlocksToClick);
@@ -220,7 +176,7 @@ public class SimonRewindGame extends AppCompatActivity {
                             Thread.sleep(1000);
 
                         }
-                        animationIsRunning = false;
+                        RGV.animationIsRunning = false;
                         enableButtons();
                     } catch (InterruptedException e) {
                         e.printStackTrace();
@@ -228,15 +184,8 @@ public class SimonRewindGame extends AppCompatActivity {
                 }
             };
 
-            //final Runnable runnable = new Runnable(runnablePre);
-            //RGV.animationHandler.post(runnable);
             new Thread(runnable).start();
-
         }
-
-        Log.i("animationIsRunning aft playAnimation: ", "" + animationIsRunning);
-
-
     }
 
     private void initializePlays() {
@@ -339,6 +288,7 @@ public class SimonRewindGame extends AppCompatActivity {
                 cancelTurn();
                 playSound(RGV.lose);
                 disableButtons();
+                gameOverAlertDialog();
                 //break;
 
             } else {
@@ -396,21 +346,21 @@ public class SimonRewindGame extends AppCompatActivity {
                 public void run() {
                     Log.i("runOnUiThread","rightButtonclicked: " + rightButtonClicked
                                                     + " finishedTheround: " + finishedTheRound
-                                                    + "newHighScore: " + newHighScore);
+                                                    + " newHighScore: " + newHighScore);
                     if (!rightButtonClicked) {
                         playSound(RGV.lose);
                         //disableButtons();
                         findViewById(R.id.start_button_sr).setEnabled(true);
-                        gameOverAlertDialog();
+                        //gameOverAlertDialog();
 
                     } else if (rightButtonClicked) { // right button was clicked
                         //if the user gets its right
-                        if (finishedTheRound) {
+                        //if (finishedTheRound) {
                             RGV.scoreText.setText("Score: " + RGV.score);
                             if (newHighScore) {
                                 RGV.highestScoreText.setText("High score: " + RGV.highestScore);
                             }
-                        }
+                        //}
                     }
                 }
             });
@@ -419,11 +369,11 @@ public class SimonRewindGame extends AppCompatActivity {
                 RGV.numOfBlocksToClick++;
                 final Runnable runnable = new Runnable() {
                     public void run() {
-                        try {
+                        //try {
                             playAnimation();
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
-                        }
+                        //} catch (InterruptedException e) {
+                            //e.printStackTrace();
+                        //}
                     }
                 };
                 // without, you can click the same button over and over again and not record your score!
@@ -437,7 +387,7 @@ public class SimonRewindGame extends AppCompatActivity {
             //    e.printStackTrace();
             //}
 
-            buttonClickedForThisRound = false;
+            RGV.buttonClickedForThisRound = false;
             setAllBoolsToFalse();
             //when done, set all booleans back to false
         }
@@ -457,15 +407,6 @@ public class SimonRewindGame extends AppCompatActivity {
     }
 
     private void setOnTouchListeners() {
-
-        /*
-        findViewById(R.id.red_button_sr).setOnTouchListener(onTouchListener);
-        findViewById(R.id.green_button_sr).setOnTouchListener(onTouchListener);
-        findViewById(R.id.blue_button_sr).setOnTouchListener(onTouchListener);
-        findViewById(R.id.yellow_button_sr).setOnTouchListener(onTouchListener);
-
-         */
-
         findViewById(R.id.red_button_sr).setOnClickListener(onClick);
         findViewById(R.id.green_button_sr).setOnClickListener(onClick);
         findViewById(R.id.blue_button_sr).setOnClickListener(onClick);
