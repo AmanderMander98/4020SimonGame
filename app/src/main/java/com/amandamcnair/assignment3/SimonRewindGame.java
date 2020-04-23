@@ -396,7 +396,7 @@ public class SimonRewindGame extends AppCompatActivity {
                 public void run() {
                     Log.i("runOnUiThread","rightButtonclicked: " + rightButtonClicked
                                                     + " finishedTheround: " + finishedTheRound
-                                                    + "newHighScore: " + newHighScore);
+                                                    + " newHighScore: " + newHighScore);
                     if (!rightButtonClicked) {
                         playSound(RGV.lose);
                         //disableButtons();
@@ -405,12 +405,12 @@ public class SimonRewindGame extends AppCompatActivity {
 
                     } else if (rightButtonClicked) { // right button was clicked
                         //if the user gets its right
-                        if (finishedTheRound) {
+                        //if (finishedTheRound) {
                             RGV.scoreText.setText("Score: " + RGV.score);
                             if (newHighScore) {
                                 RGV.highestScoreText.setText("High score: " + RGV.highestScore);
                             }
-                        }
+                        //}
                     }
                 }
             });
