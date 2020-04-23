@@ -155,7 +155,7 @@ public class SimonRewindGame extends AppCompatActivity {
                 public void run() {
 
                     try {
-                        Thread.sleep(500);
+                        Thread.sleep(750);
                         for (int j = 0; j < RGV.numOfBlocksToClick; j++) {
                             // this is the computer creating the button animations
                             Log.i("Loop start", "j = " + j + " RGV.numOfBlocksToClick = " + RGV.numOfBlocksToClick);
