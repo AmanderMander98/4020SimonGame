@@ -1,140 +1,30 @@
-<?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context=".MainActivity"
-    android:background="#000">
+<?xml version="1.0" encoding="UTF-8"?>
+
+    <androidx.constraintlayout.widget.ConstraintLayout android:background="#000" tools:context=".MainActivity" android:layout_height="match_parent" android:layout_width="match_parent" xmlns:tools="http://schemas.android.com/tools" xmlns:app="http://schemas.android.com/apk/res-auto" xmlns:android="http://schemas.android.com/apk/res/android">
 
     <!--android:background="#006"-->
 
 
-    <TextView
-        android:id="@+id/simon_title"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="SIMON TRICKSTER"
-        android:textColor="#fff"
-        android:textSize="40sp"
-        android:textStyle="bold"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.498"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/stop_button" />
+    <ImageView android:layout_height="109dp" android:layout_width="293dp" app:srcCompat="@drawable/simon_trickster_name" app:layout_constraintTop_toBottomOf="@+id/stop_button" app:layout_constraintStart_toStartOf="parent" app:layout_constraintEnd_toEndOf="parent" android:id="@+id/imageView5"/>
 
-    <TextView
-        android:id="@+id/score_textview"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Score:"
-        android:textColor="#fff"
-        android:textSize="30sp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/simon_title" />
+    <TextView android:layout_height="wrap_content" android:layout_width="wrap_content" app:layout_constraintTop_toBottomOf="@+id/imageView5" app:layout_constraintStart_toStartOf="parent" app:layout_constraintEnd_toEndOf="parent" android:id="@+id/score_textview" android:textSize="22sp" android:textColor="#fff" android:text="Score: 0" android:fontFamily="monospace"/>
 
-    <TextView
-        android:id="@+id/highestscore_textview"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Highest Score:"
-        android:textSize="30sp"
-        android:textColor="#fff"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/score_textview" />
+    <TextView android:layout_height="wrap_content" android:layout_width="wrap_content" app:layout_constraintTop_toBottomOf="@+id/score_textview" app:layout_constraintStart_toStartOf="parent" app:layout_constraintEnd_toEndOf="parent" android:id="@+id/highestscore_textview" android:textSize="22sp" android:textColor="#fff" android:text="Highest Score:" android:fontFamily="monospace"/>
 
-    <Button
-        android:id="@+id/start_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="START"
-        android:textSize="30sp"
-        android:textColor="#fff"
-        android:background="#000"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/blue_button" />
+    <Button android:background="#000" android:layout_height="wrap_content" android:layout_width="wrap_content" app:layout_constraintTop_toBottomOf="@+id/blue_button" app:layout_constraintStart_toStartOf="parent" app:layout_constraintEnd_toEndOf="parent" android:id="@+id/start_button" android:textSize="30sp" android:textColor="#fff" android:text="[ START ]" android:fontFamily="monospace" app:layout_constraintBottom_toBottomOf="parent"/>
 
-    <ImageButton
-        android:id="@+id/blue_button"
-        android:layout_width="126dp"
-        android:layout_height="116dp"
-        android:layout_marginStart="60dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/red_button"
-        app:layout_constraintVertical_bias="0.192"
-        app:srcCompat="@drawable/red_image_selector" />
+    <ImageButton android:layout_height="116dp" android:layout_width="126dp" app:srcCompat="@drawable/red_image_selector" app:layout_constraintTop_toBottomOf="@+id/red_button" app:layout_constraintStart_toStartOf="parent" android:id="@+id/blue_button" app:layout_constraintBottom_toBottomOf="parent" app:layout_constraintVertical_bias="0.192" android:layout_marginStart="52dp"/>
 
-    <ImageButton
-        android:id="@+id/red_button"
-        android:layout_width="126dp"
-        android:layout_height="116dp"
-        android:layout_marginStart="52dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/highestscore_textview"
-        app:layout_constraintVertical_bias="0.145"
-        app:srcCompat="@drawable/red_image_selector" />
+    <ImageButton android:layout_height="116dp" android:layout_width="126dp" app:srcCompat="@drawable/red_image_selector" app:layout_constraintTop_toBottomOf="@+id/highestscore_textview" app:layout_constraintStart_toStartOf="parent" android:id="@+id/red_button" app:layout_constraintBottom_toBottomOf="parent" app:layout_constraintVertical_bias="0.145" android:layout_marginStart="52dp"/>
 
-    <ImageButton
-        android:id="@+id/green_button"
-        android:layout_width="126dp"
-        android:layout_height="116dp"
-        android:layout_marginEnd="52dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/highestscore_textview"
-        app:layout_constraintVertical_bias="0.145"
-        app:srcCompat="@drawable/red_image_selector" />
+    <ImageButton android:layout_height="116dp" android:layout_width="126dp" app:srcCompat="@drawable/red_image_selector" app:layout_constraintTop_toBottomOf="@+id/highestscore_textview" app:layout_constraintEnd_toEndOf="parent" android:id="@+id/green_button" app:layout_constraintBottom_toBottomOf="parent" app:layout_constraintVertical_bias="0.145" android:layout_marginEnd="52dp"/>
 
-    <ImageButton
-        android:id="@+id/yellow_button"
-        android:layout_width="126dp"
-        android:layout_height="116dp"
-        android:layout_marginEnd="52dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/green_button"
-        app:layout_constraintVertical_bias="0.192"
-        app:srcCompat="@drawable/red_image_selector" />
+    <ImageButton android:layout_height="116dp" android:layout_width="126dp" app:srcCompat="@drawable/red_image_selector" app:layout_constraintTop_toBottomOf="@+id/green_button" app:layout_constraintEnd_toEndOf="parent" android:id="@+id/yellow_button" app:layout_constraintBottom_toBottomOf="parent" app:layout_constraintVertical_bias="0.192" android:layout_marginEnd="52dp"/>
 
-    <Button
-        android:id="@+id/play_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="PLAY"
-        android:textColor="#fff"
-        android:textSize="20sp"
-        android:background="?android:attr/selectableItemBackground"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+    <Button android:background="?android:attr/selectableItemBackground" android:layout_height="wrap_content" android:layout_width="wrap_content" app:layout_constraintStart_toStartOf="parent" android:id="@+id/play_button" android:textSize="20sp" android:textColor="#fff" android:text="PLAY" app:layout_constraintTop_toTopOf="parent" app:layout_constraintEnd_toStartOf="@+id/pause_button" android:layout_marginTop="16dp"/>
 
-    <Button
-        android:id="@+id/pause_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="88dp"
-        android:background="?android:attr/selectableItemBackground"
-        android:text="PAUSE"
-        android:textColor="#fff"
-        android:textSize="20sp"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+    <Button android:background="?android:attr/selectableItemBackground" android:layout_height="wrap_content" android:layout_width="wrap_content" app:layout_constraintStart_toStartOf="parent" app:layout_constraintEnd_toEndOf="parent" android:id="@+id/pause_button" android:textSize="20sp" android:textColor="#fff" android:text="PAUSE" app:layout_constraintTop_toTopOf="parent" android:layout_marginTop="16dp"/>
 
-    <Button
-        android:id="@+id/stop_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="176dp"
-        android:background="?android:attr/selectableItemBackground"
-        android:text="STOP"
-        android:textColor="#fff"
-        android:textSize="20sp"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+    <Button android:background="?android:attr/selectableItemBackground" android:layout_height="wrap_content" android:layout_width="wrap_content" app:layout_constraintEnd_toEndOf="parent" android:id="@+id/stop_button" android:textSize="20sp" android:textColor="#fff" android:text="STOP" app:layout_constraintTop_toTopOf="parent" android:layout_marginTop="16dp" app:layout_constraintStart_toEndOf="@+id/pause_button"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

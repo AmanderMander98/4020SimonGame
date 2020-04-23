@@ -1,16 +1,24 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="UTF-8"?>
+
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".MainActivity"
-    android:background="@drawable/simon_bg">
+    android:background="@drawable/simon_bg_updated"
+    tools:context=".MainActivity">
 
     <!--android:background="#006"-->
+
+
+    -
+
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent">
+
+
+        -
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
@@ -21,29 +29,29 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:background="?android:attr/selectableItemBackground"
-                android:text="PLAY ORIGINAL SIMON"
-                android:textColor="#fff"
-                android:textSize="30sp"
+                android:fontFamily="monospace"
                 android:paddingTop="20px"
                 android:paddingBottom="20px"
+                android:text="[ ORIGINAL ]"
+                android:textColor="#fff"
+                android:textSize="28sp"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.554"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/simon_trickster_title" />
+                app:layout_constraintTop_toBottomOf="@+id/simonLogoNameImageView" />
 
             <Button
-                android:id="@+id/button4"
+                android:id="@+id/simon_rewind_button_mainactivity"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:background="?android:attr/selectableItemBackground"
-                android:text="ANOTHER VARIATION"
-                android:textColor="#fff"
-                android:textSize="30sp"
+                android:fontFamily="monospace"
                 android:paddingTop="20px"
                 android:paddingBottom="20px"
+                android:text="[ REWIND ]"
+                android:textColor="#fff"
+                android:textSize="28sp"
                 app:layout_constraintBottom_toTopOf="@+id/about_button"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.458"
                 app:layout_constraintStart_toStartOf="parent" />
 
             <Button
@@ -51,14 +59,14 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:background="?android:attr/selectableItemBackground"
-                android:text="ABOUT"
-                android:textColor="#fff"
-                android:textSize="30sp"
+                android:fontFamily="monospace"
                 android:paddingTop="20px"
                 android:paddingBottom="20px"
+                android:text="[ ABOUT ]"
+                android:textColor="#fff"
+                android:textSize="28sp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.485"
                 app:layout_constraintStart_toStartOf="parent" />
 
             <Button
@@ -66,38 +74,28 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:background="?android:attr/selectableItemBackground"
+                android:fontFamily="monospace"
                 android:paddingTop="20px"
                 android:paddingBottom="20px"
-                android:text="Simon Trickster(Surprise)"
+                android:text="[ Trickster/Surprise ]"
                 android:textColor="#fff"
-                android:textSize="30sp"
-                app:layout_constraintBottom_toTopOf="@+id/button4"
+                android:textSize="27sp"
+                app:layout_constraintBottom_toTopOf="@+id/simon_rewind_button_mainactivity"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.458"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/original_simon_game" />
-
-            <TextView
-                android:id="@+id/simon_trickster_title"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="SIMON GAME"
-                android:textColor="#fff"
-                android:textSize="50sp"
-                android:textStyle="bold"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.504"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/stop_button" />
 
             <Button
                 android:id="@+id/play_button"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
                 android:background="?android:attr/selectableItemBackground"
+                android:fontFamily="monospace"
                 android:text="PLAY"
                 android:textColor="#fff"
                 android:textSize="20sp"
+                app:layout_constraintEnd_toStartOf="@+id/pause_button"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
@@ -105,11 +103,12 @@
                 android:id="@+id/pause_button"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="88dp"
+                android:layout_marginTop="16dp"
                 android:background="?android:attr/selectableItemBackground"
                 android:text="PAUSE"
                 android:textColor="#fff"
                 android:textSize="20sp"
+                app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
@@ -117,15 +116,26 @@
                 android:id="@+id/stop_button"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="176dp"
+                android:layout_marginTop="16dp"
                 android:background="?android:attr/selectableItemBackground"
                 android:text="STOP"
                 android:textColor="#fff"
                 android:textSize="20sp"
-                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@+id/pause_button"
                 app:layout_constraintTop_toTopOf="parent" />
-        </androidx.constraintlayout.widget.ConstraintLayout>
-    </ScrollView>
 
+            <ImageView
+                android:id="@+id/simonLogoNameImageView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/stop_button"
+                app:srcCompat="@drawable/simon_name_logo" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </ScrollView>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -43,6 +43,13 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        findViewById(R.id.simon_rewind_button_mainactivity).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                playSimonRewindGame();
+            }
+        });
+
         findViewById(R.id.about_button).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -95,6 +102,12 @@ public class MainActivity extends AppCompatActivity {
     private void playSimonTricksterGame()
     {
         Intent intent = new Intent(getApplicationContext(), SimonTricksterGame.class);
+        startActivity(intent);
+    }
+
+    private void playSimonRewindGame()
+    {
+        Intent intent = new Intent(getApplicationContext(), SimonRewindGame.class);
         startActivity(intent);
     }
 

@@ -51,9 +51,7 @@ public class SimonOriginalGame extends AppCompatActivity {
     private int lose;
     private Animation animation = new AlphaAnimation(1, 0);
 
-    enum MediaState {NOT_READY, PLAYING, PAUSED, STOPPED};
     private MainActivity.MediaState mediaState;
-
     private MediaPlayer mediaPlayer;
 
     @Override
@@ -71,7 +69,7 @@ public class SimonOriginalGame extends AppCompatActivity {
 
         // green stuff cannot be the same in another class                 // right here below
         SharedPreferences simonOriginalprefs = this.getSharedPreferences("HIGHSCOREsimonOriginal", getApplicationContext().MODE_PRIVATE);
-                                                   // right here below
+        // right here below
         highestScore = simonOriginalprefs.getInt("HIGHSCOREsimonOriginal", 0);
         runOnUiThread(new Runnable() {
             public void run() {
@@ -136,134 +134,137 @@ public class SimonOriginalGame extends AppCompatActivity {
             }
         });
 
+        showRulesAlertDialog();
     }
 
-        View.OnTouchListener touched = new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                if (event.getAction() == MotionEvent.ACTION_DOWN) {
+    View.OnTouchListener touched = new View.OnTouchListener() {
+        @Override
+        public boolean onTouch(View v, MotionEvent event) {
+            if (event.getAction() == MotionEvent.ACTION_DOWN) {
 
-                    // player clicking buttons
-                    switch (v.getId()) {
-                        case R.id.red_button:
-                            buttonClick = 1;
-                            playSound(bell);
-                            break;
-                        case R.id.green_button:
-                            buttonClick = 2;
-                            break;
-                        case R.id.blue_button:
-                            buttonClick = 3;
-                            break;
-                        case R.id.yellow_button:
-                            buttonClick = 4;
-                            break;
-                    }
-
-                    // if player clicks wrong button, he/she loses
-                    if (plays[numOfClicks] != buttonClick)
-                    {
-                        playSound(lose);
-                        findViewById(R.id.red_button).setEnabled(false);
-                        findViewById(R.id.green_button).setEnabled(false);
-                        findViewById(R.id.blue_button).setEnabled(false);
-                        findViewById(R.id.yellow_button).setEnabled(false);
-
-                        findViewById(R.id.start_button).setEnabled(true);
-
-                        Toast.makeText(getApplicationContext(), "GAME OVER!", Toast.LENGTH_SHORT).show();
-                        AlertDialog.Builder builder = new AlertDialog.Builder(SimonOriginalGame.this); // need a new one because of running activity
-                        builder.setTitle("GAME OVER!");
-                        //builder.setMessage("You lost :( \n Click 'Play again!' or 'home' to go back to home.");
-                        builder.setMessage("You lost :( \n Your score was " + score + "\nClick 'home' to go back to home.");
-
-                        builder.setNegativeButton("HOME", new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int choice) {
-                                // Dismiss Dialog
-                                Intent i = new Intent(getApplicationContext(), MainActivity.class);
-                                getApplicationContext().startActivity(i);
-                            }
-                        });
-
-                        AlertDialog dialog = builder.create();
-                        dialog.show();
-                        dialog.getWindow().setLayout(1100, 600);
-
-                        return true;
-                    }
-                    //if the user gets its right
-                    if (v.getId() == R.id.red_button)
-                    {
+                // player clicking buttons
+                switch (v.getId()) {
+                    case R.id.red_button:
+                        buttonClick = 1;
                         playSound(bell);
-                        // when I click, it will animate
-                        animation = new AlphaAnimation(1, 0);
-                        animation.setDuration(300);
-                        animation.setInterpolator(new LinearInterpolator());
-                        findViewById(R.id.red_button).startAnimation(animation);
-                        //Log.i("PRESSED RED", "Red");
-                    }
-                    else if (v.getId() == R.id.green_button)
-                    {
-                        playSound(ding);
-                        // when I click, it will animate
-                        animation = new AlphaAnimation(1, 0);
-                        animation.setDuration(300);
-                        animation.setInterpolator(new LinearInterpolator());
-                        findViewById(R.id.green_button).startAnimation(animation);
-                        //Log.i("PRESSED GREEN", "Green");
-                    }
-                    else if (v.getId() == R.id.blue_button)
-                    {
-                        playSound(dong);
-                        // when I click, it will animate
-                        animation = new AlphaAnimation(1, 0);
-                        animation.setDuration(300);
-                        animation.setInterpolator(new LinearInterpolator());
-                        findViewById(R.id.blue_button).startAnimation(animation);
-                        //Log.i("PRESSED BLUE", "Blue");
-                    }
-                    else if (v.getId() == R.id.yellow_button)
-                    {
-                        playSound(high_ding);
-                        // when I click, it will animate
-                        animation = new AlphaAnimation(1, 0);
-                        animation.setDuration(300);
-                        animation.setInterpolator(new LinearInterpolator());
-                        findViewById(R.id.yellow_button).startAnimation(animation);
-                        //Log.i("PRESSED YELLOW", "Yellow");
-                    }
-                    numOfClicks++;
-
-
-                    if (numOfBlocksToClick == numOfClicks) {
-
-                        score++;
-                        scoreText.setText("Score: " + score);
-
-                        numOfClicks = 0;
-                        if (numOfBlocksToClick > highestScore) {
-                            highestScore = numOfBlocksToClick;
-                            // green stuff cannot be the same in another class                 // right here below
-                            SharedPreferences highScoresSimonOriginal = getSharedPreferences("HIGHSCOREsimonOriginal", Context.MODE_PRIVATE);
-                            SharedPreferences.Editor editorSimonOriginal = highScoresSimonOriginal.edit();
-                                                         // right here below
-                            editorSimonOriginal.putInt("HIGHSCOREsimonOriginal", highestScore);
-                            editorSimonOriginal.commit();
-
-                            highestScoreText.setText("High score: " + highestScore);
-
-                        }
-                        final Runnable runnable = new Runnable() {
-                            public void run() {
-                                playGame();
-                            }
-                        };
-                        handler.postDelayed(runnable, 1000); // without, you can click the same button over and over again and not record your score!
-                    }
+                        break;
+                    case R.id.green_button:
+                        buttonClick = 2;
+                        break;
+                    case R.id.blue_button:
+                        buttonClick = 3;
+                        break;
+                    case R.id.yellow_button:
+                        buttonClick = 4;
+                        break;
                 }
-                return true;
+
+                // if player clicks wrong button, he/she loses
+                if (plays[numOfClicks] != buttonClick)
+                {
+                    playSound(lose);
+                    findViewById(R.id.red_button).setEnabled(false);
+                    findViewById(R.id.green_button).setEnabled(false);
+                    findViewById(R.id.blue_button).setEnabled(false);
+                    findViewById(R.id.yellow_button).setEnabled(false);
+
+                    findViewById(R.id.start_button).setEnabled(true);
+
+                    Toast.makeText(getApplicationContext(), "GAME OVER!", Toast.LENGTH_SHORT).show();
+                    AlertDialog.Builder builder = new AlertDialog.Builder(SimonOriginalGame.this); // need a new one because of running activity
+                    builder.setTitle("GAME OVER!");
+                    //builder.setMessage("You lost :( \n Click 'Play again!' or 'home' to go back to home.");
+                    builder.setMessage("You lost :( \n Your score was " + score + "\nClick 'home' to go back to home.");
+
+                    builder.setNegativeButton("HOME", new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int choice) {
+                            // Dismiss Dialog
+                            Intent i = new Intent(getApplicationContext(), MainActivity.class);
+                            getApplicationContext().startActivity(i);
+                        }
+                    });
+
+                    AlertDialog dialog = builder.create();
+                    dialog.show();
+                    dialog.getWindow().setLayout(1100, 600);
+
+                    return true;
+                }
+                //if the user gets its right
+                if (v.getId() == R.id.red_button)
+                {
+                    playSound(bell);
+                    // when I click, it will animate
+                    animation = new AlphaAnimation(1, 0);
+                    animation.setDuration(300);
+                    animation.setInterpolator(new LinearInterpolator());
+                    findViewById(R.id.red_button).startAnimation(animation);
+                    //Log.i("PRESSED RED", "Red");
+                }
+                else if (v.getId() == R.id.green_button)
+                {
+                    playSound(ding);
+                    // when I click, it will animate
+                    animation = new AlphaAnimation(1, 0);
+                    animation.setDuration(300);
+                    animation.setInterpolator(new LinearInterpolator());
+                    findViewById(R.id.green_button).startAnimation(animation);
+                    //Log.i("PRESSED GREEN", "Green");
+                }
+                else if (v.getId() == R.id.blue_button)
+                {
+                    playSound(dong);
+                    // when I click, it will animate
+                    animation = new AlphaAnimation(1, 0);
+                    animation.setDuration(300);
+                    animation.setInterpolator(new LinearInterpolator());
+                    findViewById(R.id.blue_button).startAnimation(animation);
+                    //Log.i("PRESSED BLUE", "Blue");
+                }
+                else if (v.getId() == R.id.yellow_button)
+                {
+                    playSound(high_ding);
+                    // when I click, it will animate
+                    animation = new AlphaAnimation(1, 0);
+                    animation.setDuration(300);
+                    animation.setInterpolator(new LinearInterpolator());
+                    findViewById(R.id.yellow_button).startAnimation(animation);
+                    //Log.i("PRESSED YELLOW", "Yellow");
+                }
+
+                numOfClicks++;
+
+                if (numOfBlocksToClick == numOfClicks) {
+
+                    score++;
+                    scoreText.setText("Score: " + score);
+                    numOfClicks = 0;
+
+                    if (numOfBlocksToClick > highestScore) {
+                        highestScore = numOfBlocksToClick;
+                        // green stuff cannot be the same in another class                 // right here below
+                        SharedPreferences highScoresSimonOriginal = getSharedPreferences("HIGHSCOREsimonOriginal", Context.MODE_PRIVATE);
+                        SharedPreferences.Editor editorSimonOriginal = highScoresSimonOriginal.edit();
+                        // right here below
+                        editorSimonOriginal.putInt("HIGHSCOREsimonOriginal", highestScore);
+                        editorSimonOriginal.commit();
+
+                        highestScoreText.setText("High score: " + highestScore);
+
+                    }
+
+                    final Runnable runnable = new Runnable() {
+                        public void run() {
+                            playGame();
+                        }
+                    };
+
+                    handler.postDelayed(runnable, 1000); // without, you can click the same button over and over again and not record your score!
+                }
             }
-        };
+            return true;
+        }
+    };
 
     private void playSound(int soundId) {
         if (soundsLoaded.contains(soundId)) {
@@ -272,7 +273,7 @@ public class SimonOriginalGame extends AppCompatActivity {
     }
 
 
-private int j;
+    private int j;
     private void playGame() {
 
         findViewById(R.id.red_button).setEnabled(true);
@@ -318,7 +319,7 @@ private int j;
                         playSound(ding);
                         //findViewById(R.id.green_button).performClick();
                         // when button auto clicks, it will animate
-                         animation.setDuration(300);
+                        animation.setDuration(300);
                         animation.setInterpolator(new LinearInterpolator());
                         findViewById(R.id.green_button).startAnimation(animation);
                         //Toast.makeText(getApplicationContext(), "Green!", Toast.LENGTH_SHORT).show();
@@ -354,6 +355,7 @@ private int j;
                 }
 
             };
+
             handler.postDelayed(runnable, (1000) * j);
         }
     }
@@ -407,12 +409,29 @@ private int j;
         }
     }
 
+    private void showRulesAlertDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(SimonOriginalGame.this); // need a new one because of running activity
+        builder.setTitle("Simon Original");
+        //builder.setMessage("You lost :( \n Click 'Play again!' or 'home' to go back to home.");
+        builder.setMessage("Welcome to Simon Original!\n\n " +
+                "Your goal is to repeat the sequence of buttons in the order they light up.\n\n" +
+                "Good luck!\n\n");
+
+        builder.setNegativeButton("LET'S PLAY!", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int choice) { }
+        });
+
+        AlertDialog dialog = builder.create();
+        dialog.show();
+        dialog.getWindow().setLayout(1100, 700);
+    }
+
     private void playAudio()
     {
         if(mediaPlayer == null)
         {
             mediaState = MainActivity.MediaState.NOT_READY;
-            mediaPlayer = MediaPlayer.create(getApplicationContext(), R.raw.mushroom_theme_0);
+            mediaPlayer = MediaPlayer.create(getApplicationContext(),R.raw.dungeon_theme);
             mediaPlayer.setLooping(true);
 
             mediaPlayer.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
@@ -450,7 +469,6 @@ private int j;
         {
             mediaPlayer.stop();
             mediaState = MainActivity.MediaState.STOPPED;
-
         }
     }
 }
