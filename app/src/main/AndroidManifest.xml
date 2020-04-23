@@ -17,6 +17,7 @@
             </intent-filter>
         </activity>
         <activity android:name=".SimonOriginalGame" android:screenOrientation="sensorPortrait"/>
+        <activity android:name=".SimonRewindGame" android:screenOrientation="sensorPortrait"/>
         <activity android:name=".About" android:screenOrientation="sensorPortrait"/>
         <activity android:name=".SimonTricksterGame" android:screenOrientation="sensorPortrait"/>
     </application>

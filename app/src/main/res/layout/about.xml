@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".MainActivity"
-    android:background="@drawable/simon_bg">
+    android:background="@drawable/simon_bg_updated">
 
     <!--android:background="#006"-->
     <ScrollView
@@ -15,53 +15,44 @@
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent">
-    <TextView
-        android:id="@+id/about_title"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="ABOUT GAME"
-        android:textColor="#fff"
-        android:textSize="50sp"
-        android:textStyle="bold"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.501"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
 
-    <Button
-        android:id="@+id/about_intro_theme_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="72dp"
-        android:background="?android:attr/selectableItemBackground"
-        android:text="ABOUT Intro Theme Music"
-        android:textColor="#fff"
-        android:textSize="25sp"
-        android:padding="5px"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.495"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/about_developers_button" />
+            <Button
+                android:id="@+id/about_intro_theme_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="32dp"
+                android:background="?android:attr/selectableItemBackground"
+                android:fontFamily="monospace"
+                android:padding="5px"
+                android:text="intro Music info"
+                android:textColor="#fff"
+                android:textSize="25sp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.495"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/about_developers_button" />
 
-    <Button
-        android:id="@+id/about_mushroom_theme_0_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:background="?android:attr/selectableItemBackground"
-        android:text="ABOUT MUSHROOM THEME MUSIC"
-        android:textColor="#fff"
-        android:textSize="25sp"
-        android:padding="5px"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/about_intro_theme_button" />
+            <Button
+                android:id="@+id/about_mushroom_theme_0_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="?android:attr/selectableItemBackground"
+                android:fontFamily="monospace"
+                android:padding="5px"
+                android:text="mushroom MUSIC info"
+                android:textColor="#fff"
+                android:textSize="25sp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/about_intro_theme_button" />
 
             <Button
                 android:id="@+id/about_developers_button"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="80dp"
+                android:layout_marginTop="8dp"
                 android:background="?android:attr/selectableItemBackground"
+                android:fontFamily="monospace"
                 android:padding="5px"
                 android:text="About the Developers"
                 android:textColor="#fff"
@@ -69,21 +60,32 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="0.495"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/about_title" />
+                app:layout_constraintTop_toBottomOf="@+id/imageView" />
 
             <Button
                 android:id="@+id/about_happy_button"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:background="?android:attr/selectableItemBackground"
+                android:fontFamily="monospace"
                 android:padding="5px"
-                android:text="About HAPPY MUSIC"
+                android:text="HAPPY MUSIC info"
                 android:textColor="#fff"
                 android:textSize="25sp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="0.504"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/about_mushroom_theme_0_button" />
+
+            <ImageView
+                android:id="@+id/imageView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="24dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:srcCompat="@drawable/about_name" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
     </ScrollView>
