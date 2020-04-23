@@ -355,7 +355,6 @@ private int j;
                 }
 
             };
-
             handler.postDelayed(runnable, (1000) * j);
         }
     }

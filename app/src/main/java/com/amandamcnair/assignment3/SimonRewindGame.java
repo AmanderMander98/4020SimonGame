@@ -27,8 +27,6 @@ public class SimonRewindGame extends AppCompatActivity {
     public MainActivity.MediaState mediaState;
     public MediaPlayer mediaPlayer;
 
-    //still not sure im going to end up using this boolean
-
     private GameValues RGV = new GameValues();
 
     @Override
@@ -319,7 +317,6 @@ public class SimonRewindGame extends AppCompatActivity {
 
                     RGV.score++;
                     RGV.numOfClicks = 0;
-                    //disableButtons();
 
                     if (RGV.numOfBlocksToClick > RGV.highestScore) {
                         newHighScore = true;
