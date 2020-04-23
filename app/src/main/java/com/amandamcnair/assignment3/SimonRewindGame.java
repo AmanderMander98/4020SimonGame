@@ -27,8 +27,6 @@ public class SimonRewindGame extends AppCompatActivity {
     public MainActivity.MediaState mediaState;
     public MediaPlayer mediaPlayer;
 
-    //still not sure im going to end up using this boolean
-
     private GameValues RGV = new GameValues();
 
     @Override
@@ -50,6 +48,7 @@ public class SimonRewindGame extends AppCompatActivity {
         RGV.highestScore = simonRewindPrefs.getInt("HIGHSCORESimonRewind", 0);
         runOnUiThread(new Runnable() {
             public void run() {
+                //RGV.highestScore = 0;
                 TextView tv = findViewById(R.id.highestscore_textview_sr);
                 tv.setText("High score: " + RGV.highestScore);
                 Log.i("HIGH SCORE", "High score: " + RGV.highestScore);
@@ -90,11 +89,8 @@ public class SimonRewindGame extends AppCompatActivity {
         findViewById(R.id.start_button_sr).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                //try {
-                    playAnimation();
-                //} catch (InterruptedException e) {
-                    //e.printStackTrace();
-                //}
+                playAnimation();
+
                 findViewById(R.id.start_button_sr).setEnabled(false);
                 Toast.makeText(getApplicationContext(), "Game has begun!", Toast.LENGTH_SHORT).show();
 
@@ -122,11 +118,6 @@ public class SimonRewindGame extends AppCompatActivity {
                 RGV.currentButton = view;
                 Log.i("OnClickListener", "currentButton: " + RGV.currentButton);
                 RGV.buttonClickedForThisRound = true;
-                //call for the button click task
-
-
-                // DONT WANT TIMER-- timer does the same thing on a schedule.
-                // we only want this to repeat when it's called again.
 
                 Thread t = new Thread() {
                     @Override
@@ -144,7 +135,24 @@ public class SimonRewindGame extends AppCompatActivity {
     };
 
     private void playAnimation() {
+
         //Runnable runnable;
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                if (RGV.score >= RGV.highestScore) {
+                    SharedPreferences highScoresSimonOriginal = getSharedPreferences("HIGHSCORESimonRewind", Context.MODE_PRIVATE);
+                    SharedPreferences.Editor editorSimonOriginal = highScoresSimonOriginal.edit();
+                    // right here below
+                    editorSimonOriginal.putInt("HIGHSCORESimonRewind", RGV.highestScore);
+                    editorSimonOriginal.commit();
+
+                    TextView tv = findViewById(R.id.highestscore_textview_sr);
+                    tv.setText("High score: " + RGV.highestScore);
+                    Log.i("HIGH SCORE", "High score: " + RGV.highestScore);
+                }
+            }
+        });
 
         if (!RGV.buttonClickedForThisRound) {
             initializePlays();
@@ -341,29 +349,6 @@ public class SimonRewindGame extends AppCompatActivity {
             Log.i("Finished the round: ", "" + finishedTheRound);
             Log.i("New high score: ", "" + newHighScore);
 
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    Log.i("runOnUiThread","rightButtonclicked: " + rightButtonClicked
-                                                    + " finishedTheround: " + finishedTheRound
-                                                    + " newHighScore: " + newHighScore);
-                    if (!rightButtonClicked) {
-                        playSound(RGV.lose);
-                        //disableButtons();
-                        findViewById(R.id.start_button_sr).setEnabled(true);
-                        //gameOverAlertDialog();
-
-                    } else if (rightButtonClicked) { // right button was clicked
-                        //if the user gets its right
-                        //if (finishedTheRound) {
-                            RGV.scoreText.setText("Score: " + RGV.score);
-                            if (newHighScore) {
-                                RGV.highestScoreText.setText("High score: " + RGV.highestScore);
-                            }
-                        //}
-                    }
-                }
-            });
 
             if (finishedTheRound) {
                 RGV.numOfBlocksToClick++;
@@ -380,6 +365,36 @@ public class SimonRewindGame extends AppCompatActivity {
                 //RGV.animationHandler.postDelayed(runnable, 1000);
                 new Thread(runnable).start();
             }
+
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    Log.i("runOnUiThread","rightButtonclicked: " + rightButtonClicked
+                            + " finishedTheround: " + finishedTheRound
+                            + " newHighScore: " + newHighScore);
+                    if (!rightButtonClicked) {
+                        playSound(RGV.lose);
+                        //disableButtons();
+                        findViewById(R.id.start_button_sr).setEnabled(true);
+                        //gameOverAlertDialog();
+
+                    } else if (rightButtonClicked) { // right button was clicked
+                        //if the user gets its right
+                        //if (finishedTheRound) {
+                        RGV.scoreText.setText("Score: " + RGV.score);
+                        //if (newHighScore) {
+                        //    RGV.highestScoreText.setText("High score: " + RGV.highestScore);
+                        //}
+
+                        if (RGV.score > RGV.highestScore) {
+                            TextView tv = findViewById(R.id.highestscore_textview_sr);
+                            tv.setText("High score: " + RGV.highestScore);
+                            Log.i("HIGH SCORE", "High score: " + RGV.highestScore);
+                        }
+                        //}
+                    }
+                }
+            });
 
             //try {
             //    Thread.sleep(1000 * RGV.numOfBlocksToClick);
