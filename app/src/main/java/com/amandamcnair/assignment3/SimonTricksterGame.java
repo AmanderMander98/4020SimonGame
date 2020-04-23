@@ -130,6 +130,9 @@ public class SimonTricksterGame extends AppCompatActivity {
             @Override
             public void run() {
                 if (RGV.score >= RGV.highestScore) {
+                    RGV.highestScore = RGV.score;
+                    highScoreToast();
+
                     SharedPreferences highScoresSimonOriginal = getSharedPreferences("HIGHSCORESimonOriginal", Context.MODE_PRIVATE);
                     SharedPreferences.Editor editorSimonOriginal = highScoresSimonOriginal.edit();
 
@@ -279,12 +282,19 @@ public class SimonTricksterGame extends AppCompatActivity {
 
 
             if (finishedTheRound) {
-                RGV.numOfBlocksToClick++;
-                final Runnable runnable = new Runnable() {
-                    public void run() {  playAnimation(); }
-                };
 
-                new Thread(runnable).start();
+                if (RGV.score == RGV.winningScore) {
+                    gameWonAlertDialog();
+                } else {
+                    RGV.numOfBlocksToClick++;
+                    final Runnable runnable = new Runnable() {
+                        public void run() {
+                            playAnimation();
+                        }
+                    };
+
+                    new Thread(runnable).start();
+                }
             }
 
             runOnUiThread(new Runnable() {
@@ -368,6 +378,30 @@ public class SimonTricksterGame extends AppCompatActivity {
         dialog.getWindow().setLayout(1100, 700);
     }
 
+    private void gameWonAlertDialog() {
+        cancelTurn();
+        //Toast.makeText(getApplicationContext(), "GAME OVER!", Toast.LENGTH_SHORT).show();
+        AlertDialog.Builder builder = new AlertDialog.Builder(SimonTricksterGame.this); // need a new one because of running activity
+        builder.setTitle("GAME OVER!");
+        //builder.setMessage("You lost :( \n Click 'Play again!' or 'home' to go back to home.");
+        builder.setMessage("You WON!!! \n Your score was " + RGV.score + "\nClick 'home' to go back to home.");
+
+        builder.setNegativeButton("HOME", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int choice) {
+                // Dismiss Dialog
+                Intent i = new Intent(getApplicationContext(), MainActivity.class);
+                getApplicationContext().startActivity(i);
+            }
+        });
+
+        AlertDialog dialog = builder.create();
+        //user can't click out of alertdialog
+        dialog.setCanceledOnTouchOutside(false);
+
+        dialog.show();
+        dialog.getWindow().setLayout(1100, 600);
+    }
+
     private void gameOverAlertDialog() {
         cancelTurn();
         Toast.makeText(getApplicationContext(), "GAME OVER!", Toast.LENGTH_SHORT).show();
@@ -384,8 +418,15 @@ public class SimonTricksterGame extends AppCompatActivity {
         });
 
         AlertDialog dialog = builder.create();
+
+        //user can't click out of alertdialog
+        dialog.setCanceledOnTouchOutside(false);
         dialog.show();
         dialog.getWindow().setLayout(1100, 600);
+    }
+
+    private void highScoreToast() {
+        Toast.makeText(getApplicationContext(), "HIGH SCORE!", Toast.LENGTH_SHORT).show();
     }
 
     private void enableButtons() {

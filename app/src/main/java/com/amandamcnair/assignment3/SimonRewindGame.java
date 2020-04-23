@@ -42,7 +42,6 @@ public class SimonRewindGame extends AppCompatActivity {
         findViewById(R.id.pause_button_sr).setOnClickListener(new PauseListener());
         findViewById(R.id.stop_button_sr).setOnClickListener(new StopListener());
 
-        // green stuff cannot be the same in another class                 // right here below
         SharedPreferences simonRewindPrefs = this.getSharedPreferences("HIGHSCORESimonRewind", getApplicationContext().MODE_PRIVATE);
         // right here below
         RGV.highestScore = simonRewindPrefs.getInt("HIGHSCORESimonRewind", 0);
@@ -135,12 +134,14 @@ public class SimonRewindGame extends AppCompatActivity {
     };
 
     private void playAnimation() {
-
         //Runnable runnable;
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
                 if (RGV.score >= RGV.highestScore) {
+                    RGV.highestScore = RGV.score;
+                    highScoreToast();
+
                     SharedPreferences highScoresSimonOriginal = getSharedPreferences("HIGHSCORESimonRewind", Context.MODE_PRIVATE);
                     SharedPreferences.Editor editorSimonOriginal = highScoresSimonOriginal.edit();
                     // right here below
@@ -292,19 +293,19 @@ public class SimonRewindGame extends AppCompatActivity {
 
 
             if (finishedTheRound) {
-                RGV.numOfBlocksToClick++;
-                final Runnable runnable = new Runnable() {
-                    public void run() {
-                        //try {
-                        playAnimation();
-                        //} catch (InterruptedException e) {
-                        //e.printStackTrace();
-                        //}
-                    }
-                };
-                // without, you can click the same button over and over again and not record your score!
-                //RGV.animationHandler.postDelayed(runnable, 1000);
-                new Thread(runnable).start();
+
+                if (RGV.score == RGV.winningScore) {
+                    gameWonAlertDialog();
+                } else {
+                    RGV.numOfBlocksToClick++;
+                    final Runnable runnable = new Runnable() {
+                        public void run() {
+                            playAnimation();
+                        }
+                    };
+
+                    new Thread(runnable).start();
+                }
             }
 
             runOnUiThread(new Runnable() {
@@ -317,35 +318,23 @@ public class SimonRewindGame extends AppCompatActivity {
                         playSound(RGV.lose);
                         //disableButtons();
                         findViewById(R.id.start_button_sr).setEnabled(true);
-                        //gameOverAlertDialog();
 
                     } else if (rightButtonClicked) { // right button was clicked
-                        //if the user gets its right
-                        //if (finishedTheRound) {
                         RGV.scoreText.setText("Score: " + RGV.score);
-                        //if (newHighScore) {
-                        //    RGV.highestScoreText.setText("High score: " + RGV.highestScore);
-                        //}
 
                         if (RGV.score > RGV.highestScore) {
                             TextView tv = findViewById(R.id.highestscore_textview_sr);
                             tv.setText("High score: " + RGV.highestScore);
                             Log.i("HIGH SCORE", "High score: " + RGV.highestScore);
                         }
-                        //}
                     }
                 }
             });
 
-            //try {
-            //    Thread.sleep(1000 * RGV.numOfBlocksToClick);
-            //} catch (InterruptedException e) {
-            //    e.printStackTrace();
-            //}
+            //when done, set all booleans back to false
 
             RGV.buttonClickedForThisRound = false;
             setAllBoolsToFalse();
-            //when done, set all booleans back to false
         }
 
         private void setAllBoolsToFalse() {
@@ -398,8 +387,35 @@ public class SimonRewindGame extends AppCompatActivity {
         });
 
         AlertDialog dialog = builder.create();
+
+        //user can't click out of alertdialog
+        dialog.setCanceledOnTouchOutside(false);
         dialog.show();
         dialog.getWindow().setLayout(1100, 700);
+    }
+
+    private void gameWonAlertDialog() {
+        cancelTurn();
+        //Toast.makeText(getApplicationContext(), "GAME OVER!", Toast.LENGTH_SHORT).show();
+        AlertDialog.Builder builder = new AlertDialog.Builder(SimonRewindGame.this); // need a new one because of running activity
+        builder.setTitle("GAME OVER!");
+        //builder.setMessage("You lost :( \n Click 'Play again!' or 'home' to go back to home.");
+        builder.setMessage("You WON!!! \n Your score was " + RGV.score + "\nClick 'home' to go back to home.");
+
+        builder.setNegativeButton("HOME", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int choice) {
+                // Dismiss Dialog
+                Intent i = new Intent(getApplicationContext(), MainActivity.class);
+                getApplicationContext().startActivity(i);
+            }
+        });
+
+        AlertDialog dialog = builder.create();
+        //user can't click out of alertdialog
+        dialog.setCanceledOnTouchOutside(false);
+
+        dialog.show();
+        dialog.getWindow().setLayout(1100, 600);
     }
 
     private void gameOverAlertDialog() {
@@ -419,8 +435,13 @@ public class SimonRewindGame extends AppCompatActivity {
         });
 
         AlertDialog dialog = builder.create();
+        dialog.setCanceledOnTouchOutside(false);
         dialog.show();
         dialog.getWindow().setLayout(1100, 600);
+    }
+
+    private void highScoreToast() {
+        Toast.makeText(getApplicationContext(), "HIGH SCORE!", Toast.LENGTH_SHORT).show();
     }
 
     private void enableButtons() {
@@ -431,13 +452,6 @@ public class SimonRewindGame extends AppCompatActivity {
     public void disableButtons() {
         //set all to null on touch listeners
         Log.i("Buttons: ", "disabled");
-
-        /*
-        findViewById(R.id.red_button_sr).setOnTouchListener(nullTouchListener);
-        findViewById(R.id.green_button_sr).setOnTouchListener(nullTouchListener);
-        findViewById(R.id.blue_button_sr).setOnTouchListener(nullTouchListener);
-        findViewById(R.id.yellow_button_sr).setOnTouchListener(nullTouchListener);
-         */
 
         findViewById(R.id.red_button_sr).setEnabled(false);
         findViewById(R.id.green_button_sr).setEnabled(false);
