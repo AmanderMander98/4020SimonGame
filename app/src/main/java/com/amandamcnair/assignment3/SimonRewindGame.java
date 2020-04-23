@@ -202,63 +202,6 @@ public class SimonRewindGame extends AppCompatActivity {
         }
     }
 
-    @Override
-    protected void onPause() {
-        super.onPause();
-        cancelTurn();
-        stopAudio();
-    }
-
-    private void cancelTurn() {
-        if (RGV.buttonPressHandler != null) {
-            //buttonPressHandler.;
-            RGV.buttonPressHandler = null;
-        }
-    }
-
-    @Override
-    protected void onStop() {
-        super.onStop();
-        cancelTurn();
-        if (mediaPlayer != null) {
-            mediaPlayer.release();
-            mediaPlayer = null;
-            mediaState = MainActivity.MediaState.NOT_READY;
-        }
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        playAudio();
-    }
-
-    class StartListener implements View.OnClickListener {
-        @Override
-        public void onClick(View view) {
-            playAudio();
-        }
-    }
-
-    class PauseListener implements View.OnClickListener {
-        @Override
-        public void onClick(View view) {
-            if (mediaPlayer != null) {
-                mediaPlayer.pause();
-                mediaState = MainActivity.MediaState.PAUSED;
-            }
-
-        }
-    }
-
-    class StopListener implements View.OnClickListener {
-        @Override
-        public void onClick(View view) {
-            stopAudio();
-        }
-    }
-
-
     class ButtonClickTask implements Runnable {
         private boolean rightButtonClicked = true;
         private boolean finishedTheRound = false;
@@ -547,6 +490,60 @@ public class SimonRewindGame extends AppCompatActivity {
         if (mediaPlayer != null) {
             mediaPlayer.stop();
             mediaState = MainActivity.MediaState.STOPPED;
+        }
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        cancelTurn();
+        if (mediaPlayer != null) {
+            mediaPlayer.release();
+            mediaPlayer = null;
+            mediaState = MainActivity.MediaState.NOT_READY;
+        }
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        cancelTurn();
+        stopAudio();
+    }
+
+    private void cancelTurn() {
+        if (RGV.buttonPressHandler != null) {
+            RGV.buttonPressHandler = null;
+        }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        playAudio();
+    }
+
+    class StartListener implements View.OnClickListener {
+        @Override
+        public void onClick(View view) {
+            playAudio();
+        }
+    }
+
+    class PauseListener implements View.OnClickListener {
+        @Override
+        public void onClick(View view) {
+            if (mediaPlayer != null) {
+                mediaPlayer.pause();
+                mediaState = MainActivity.MediaState.PAUSED;
+            }
+        }
+    }
+
+    class StopListener implements View.OnClickListener {
+        @Override
+        public void onClick(View view) {
+            stopAudio();
         }
     }
 }
