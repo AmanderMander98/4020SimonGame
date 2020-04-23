@@ -17,7 +17,9 @@ import android.view.View;
 import android.view.animation.LinearInterpolator;
 import android.widget.TextView;
 import android.widget.Toast;
+
 import androidx.appcompat.app.AppCompatActivity;
+
 import java.util.HashSet;
 
 public class SimonRewindGame extends AppCompatActivity {
@@ -108,17 +110,23 @@ public class SimonRewindGame extends AppCompatActivity {
 
     View.OnTouchListener nullTouchListener = new View.OnTouchListener() {
         @Override
-        public boolean onTouch(View v, MotionEvent event){
+        public boolean onTouch(View v, MotionEvent event) {
             return true;
         }
     };
 
+    /*
     View.OnTouchListener onTouchListener = new View.OnTouchListener() {
         @Override
         public boolean onTouch(View v, MotionEvent event) {
+            Log.i("OnTouchListener", "animationIsRunning: " + animationIsRunning + " v.id = " + v.getId() );
             if (event.getAction() == MotionEvent.ACTION_DOWN &&
-                !animationIsRunning && !buttonClickedForThisRound) {
+                    !animationIsRunning
+                    //&& !buttonClickedForThisRound
 
+            ) {
+
+                Log.i("OnTouchListener", "currentButton: " + RGV.currentButton);
                 buttonClickedForThisRound = true;
                 //call for the button click task
                 RGV.currentButton = v;
@@ -140,11 +148,40 @@ public class SimonRewindGame extends AppCompatActivity {
 
             }
 
-            Log.i("animationIsRunning onTouch: ","" + animationIsRunning);
             return true;
         }
     };
+    */
 
+    View.OnClickListener onClick = new View.OnClickListener() {
+        @Override
+        public void onClick(View view) {
+            Log.i("OnClickListener", "animationIsRunning: " + animationIsRunning + " v.id = " + view.getId() );
+            if(!animationIsRunning) {
+
+                RGV.currentButton = view;
+                Log.i("OnClickListener", "currentButton: " + RGV.currentButton);
+                buttonClickedForThisRound = true;
+                //call for the button click task
+
+
+                // DONT WANT TIMER-- timer does the same thing on a schedule.
+                // we only want this to repeat when it's called again.
+
+                Thread t = new Thread() {
+                    @Override
+                    public void run() {
+                        Looper.prepare();
+                        RGV.buttonPressHandler = new Handler();
+                        RGV.buttonPressHandler.post(new ButtonClickTask());
+                        Looper.loop();
+                    }
+                };
+
+                t.start();
+            }
+        }
+    };
 
     private void playAnimation() throws InterruptedException {
 
@@ -162,58 +199,49 @@ public class SimonRewindGame extends AppCompatActivity {
                 @Override
                 public void run() {
 
-                    for (int j = 0; j < RGV.numOfBlocksToClick; j++) {
-                        final int newJ = j;
-                        // this is the computer creating the button animations
-                        Log.i("Num of Blocks to Click", "" + RGV.numOfBlocksToClick);
+                    try {
+                        for (int j = 0; j < RGV.numOfBlocksToClick; j++) {
+                            // this is the computer creating the button animations
+                            Log.i("Loop start", "j = " + j + " RGV.numOfBlocksToClick = " + RGV.numOfBlocksToClick);
 
-                        //runOnUiThread(new Runn);
-                        if (RGV.plays[newJ] == 1) {
-                            runAnimationAndPlaySound(findViewById(R.id.red_button_sr), RGV.bell);
-                        } else if (RGV.plays[newJ] == 2) {
-                            runAnimationAndPlaySound(findViewById(R.id.green_button_sr), RGV.ding);
-                        } else if (RGV.plays[newJ] == 3) {
-                            runAnimationAndPlaySound(findViewById(R.id.blue_button_sr), RGV.dong);
-                        } else if (RGV.plays[newJ] == 4) {
-                            runAnimationAndPlaySound(findViewById(R.id.yellow_button_sr), RGV.high_ding);
+                            //runOnUiThread(new Runn);
+                            if (RGV.plays[j] == 1) {
+                                runAnimationAndPlaySound(findViewById(R.id.red_button_sr), RGV.bell);
+                            } else if (RGV.plays[j] == 2) {
+                                runAnimationAndPlaySound(findViewById(R.id.green_button_sr), RGV.ding);
+                            } else if (RGV.plays[j] == 3) {
+                                runAnimationAndPlaySound(findViewById(R.id.blue_button_sr), RGV.dong);
+                            } else if (RGV.plays[j] == 4) {
+                                runAnimationAndPlaySound(findViewById(R.id.yellow_button_sr), RGV.high_ding);
+                            }
+
+                            Log.i("Loop end", "RGV.plays[j] = " + RGV.plays[j]);
+
+                            Thread.sleep(1000);
+
                         }
-
-                        Log.i("RGV.plays[i] = ", "" + RGV.plays[newJ]);
-
-
-                        try {
-                            Thread.sleep(2000);
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
-                        }
+                        animationIsRunning = false;
+                        enableButtons();
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
                     }
                 }
             };
 
-        } else {
-            //do nothing with the runnable
-            runnable = new Runnable() {
-                @Override
-                public void run() {
-                    //disable
-                }
-            };
+            //final Runnable runnable = new Runnable(runnablePre);
+            //RGV.animationHandler.post(runnable);
+            new Thread(runnable).start();
 
         }
 
-        //final Runnable runnable = new Runnable(runnablePre);
-        //RGV.animationHandler.post(runnable);
-        new Thread(runnable).start();
-
-        animationIsRunning = false;
         Log.i("animationIsRunning aft playAnimation: ", "" + animationIsRunning);
-        //enableButtons();
+
 
     }
 
     private void initializePlays() {
         for (int i = 0; i < 20; i++) {
-            if (RGV.plays[i] == 0 || RGV.plays == null)  {
+            if (RGV.plays[i] == 0 || RGV.plays == null) {
                 RGV.plays[i] = RGV.random.nextInt(4) + 1;  // 1 -4
             }
         }
@@ -237,7 +265,7 @@ public class SimonRewindGame extends AppCompatActivity {
     protected void onStop() {
         super.onStop();
         cancelTurn();
-        if(mediaPlayer != null) {
+        if (mediaPlayer != null) {
             mediaPlayer.release();
             mediaPlayer = null;
             mediaState = MainActivity.MediaState.NOT_READY;
@@ -250,17 +278,17 @@ public class SimonRewindGame extends AppCompatActivity {
         playAudio();
     }
 
-    class StartListener implements View.OnClickListener{
+    class StartListener implements View.OnClickListener {
         @Override
         public void onClick(View view) {
             playAudio();
         }
     }
 
-    class PauseListener implements View.OnClickListener{
+    class PauseListener implements View.OnClickListener {
         @Override
         public void onClick(View view) {
-            if(mediaPlayer != null)  {
+            if (mediaPlayer != null) {
                 mediaPlayer.pause();
                 mediaState = MainActivity.MediaState.PAUSED;
             }
@@ -268,15 +296,16 @@ public class SimonRewindGame extends AppCompatActivity {
         }
     }
 
-    class StopListener implements View.OnClickListener{
+    class StopListener implements View.OnClickListener {
         @Override
-        public void onClick(View view) {  stopAudio(); }
+        public void onClick(View view) {
+            stopAudio();
+        }
     }
 
 
-
     class ButtonClickTask implements Runnable {
-        private boolean rightButtonClicked = false;
+        private boolean rightButtonClicked = true;
         private boolean finishedTheRound = false;
         private boolean newHighScore = false;
 
@@ -316,31 +345,31 @@ public class SimonRewindGame extends AppCompatActivity {
                 rightButtonClicked = true;
 
                 if (RGV.currentButton.getId() == R.id.red_button_sr) {
-                    buttonToAnimate =  R.id.red_button_sr;
+                    buttonToAnimate = R.id.red_button_sr;
                     soundToPlay = RGV.bell;
                 } else if (RGV.currentButton.getId() == R.id.green_button_sr) {
                     //runAnimationAndPlaySound(findViewById(R.id.green_button_sr), RGV.ding);
-                    buttonToAnimate =  R.id.green_button_sr;
+                    buttonToAnimate = R.id.green_button_sr;
                     soundToPlay = RGV.ding;
                 } else if (RGV.currentButton.getId() == R.id.blue_button_sr) {
                     //runAnimationAndPlaySound(findViewById(R.id.blue_button_sr), RGV.dong);
-                    buttonToAnimate =  R.id.blue_button_sr;
+                    buttonToAnimate = R.id.blue_button_sr;
                     soundToPlay = RGV.dong;
                 } else if (RGV.currentButton.getId() == R.id.yellow_button_sr) {
                     //runAnimationAndPlaySound(findViewById(R.id.yellow_button_sr), RGV.high_ding);
-                    buttonToAnimate =  R.id.yellow_button_sr;
+                    buttonToAnimate = R.id.yellow_button_sr;
                     soundToPlay = RGV.high_ding;
                 }
 
                 RGV.numOfClicks++;
-                runAnimationAndPlaySound(findViewById(buttonToAnimate),soundToPlay);
+                runAnimationAndPlaySound(findViewById(buttonToAnimate), soundToPlay);
 
                 if (RGV.numOfBlocksToClick == RGV.numOfClicks) {
                     finishedTheRound = true;
 
                     RGV.score++;
                     RGV.numOfClicks = 0;
-                    disableButtons();
+                    //disableButtons();
 
                     if (RGV.numOfBlocksToClick > RGV.highestScore) {
                         newHighScore = true;
@@ -357,14 +386,17 @@ public class SimonRewindGame extends AppCompatActivity {
             }
 
 
-            Log.i("Button clicked: ",  "" + RGV.buttonClick);
-            Log.i("Right button clicked: ",  "" + rightButtonClicked);
-            Log.i("Finished the round: ",  "" + finishedTheRound);
-            Log.i("New high score: ",  "" + newHighScore);
+            Log.i("Button clicked: ", "" + RGV.buttonClick);
+            Log.i("Right button clicked: ", "" + rightButtonClicked);
+            Log.i("Finished the round: ", "" + finishedTheRound);
+            Log.i("New high score: ", "" + newHighScore);
 
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
+                    Log.i("runOnUiThread","rightButtonclicked: " + rightButtonClicked
+                                                    + " finishedTheround: " + finishedTheRound
+                                                    + "newHighScore: " + newHighScore);
                     if (!rightButtonClicked) {
                         playSound(RGV.lose);
                         //disableButtons();
@@ -373,8 +405,6 @@ public class SimonRewindGame extends AppCompatActivity {
 
                     } else if (rightButtonClicked) { // right button was clicked
                         //if the user gets its right
-                        //runAnimationAndPlaySound(findViewById(buttonToAnimate),soundToPlay);
-
                         if (finishedTheRound) {
                             RGV.scoreText.setText("Score: " + RGV.score);
                             if (newHighScore) {
@@ -408,13 +438,12 @@ public class SimonRewindGame extends AppCompatActivity {
             //}
 
             buttonClickedForThisRound = false;
-
             setAllBoolsToFalse();
             //when done, set all booleans back to false
         }
 
         private void setAllBoolsToFalse() {
-            rightButtonClicked = false;
+            rightButtonClicked = true;
             finishedTheRound = false;
             newHighScore = false;
         }
@@ -429,10 +458,18 @@ public class SimonRewindGame extends AppCompatActivity {
 
     private void setOnTouchListeners() {
 
+        /*
         findViewById(R.id.red_button_sr).setOnTouchListener(onTouchListener);
         findViewById(R.id.green_button_sr).setOnTouchListener(onTouchListener);
         findViewById(R.id.blue_button_sr).setOnTouchListener(onTouchListener);
         findViewById(R.id.yellow_button_sr).setOnTouchListener(onTouchListener);
+
+         */
+
+        findViewById(R.id.red_button_sr).setOnClickListener(onClick);
+        findViewById(R.id.green_button_sr).setOnClickListener(onClick);
+        findViewById(R.id.blue_button_sr).setOnClickListener(onClick);
+        findViewById(R.id.yellow_button_sr).setOnClickListener(onClick);
 
 
         findViewById(R.id.red_button_sr).setEnabled(true);
@@ -459,7 +496,8 @@ public class SimonRewindGame extends AppCompatActivity {
                 "Good luck!\n\n");
 
         builder.setNegativeButton("LET'S PLAY!", new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int choice) { }
+            public void onClick(DialogInterface dialog, int choice) {
+            }
         });
 
         AlertDialog dialog = builder.create();
@@ -518,9 +556,9 @@ public class SimonRewindGame extends AppCompatActivity {
 
 
     public void playAudio() {
-        if(mediaPlayer == null) {
+        if (mediaPlayer == null) {
             mediaState = MainActivity.MediaState.NOT_READY;
-            mediaPlayer = MediaPlayer.create(getApplicationContext(),R.raw.mushroom_theme_0);
+            mediaPlayer = MediaPlayer.create(getApplicationContext(), R.raw.mushroom_theme_0);
             mediaPlayer.setLooping(true);
 
             mediaPlayer.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
@@ -540,17 +578,17 @@ public class SimonRewindGame extends AppCompatActivity {
                 }
             });
 
-        } else if(mediaState == MainActivity.MediaState.PAUSED) {
+        } else if (mediaState == MainActivity.MediaState.PAUSED) {
             mediaPlayer.start();
             mediaState = MainActivity.MediaState.PLAYING;
-        } else if(mediaState == MainActivity.MediaState.STOPPED) {
+        } else if (mediaState == MainActivity.MediaState.STOPPED) {
             mediaPlayer.prepareAsync();
             mediaState = MainActivity.MediaState.NOT_READY;
         }
     }
 
     public void stopAudio() {
-        if(mediaPlayer != null) {
+        if (mediaPlayer != null) {
             mediaPlayer.stop();
             mediaState = MainActivity.MediaState.STOPPED;
         }
