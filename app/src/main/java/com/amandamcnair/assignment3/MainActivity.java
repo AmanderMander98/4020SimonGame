@@ -12,7 +12,7 @@ import java.util.Random;
 
 public class MainActivity extends AppCompatActivity {
 
-    enum MediaState { NOT_READY, PLAYING, PAUSED, STOPPED};
+    enum MediaState {NOT_READY, PLAYING, PAUSED, STOPPED};
     private MediaState mediaState;
 
     private MediaPlayer mediaPlayer;
@@ -25,32 +25,39 @@ public class MainActivity extends AppCompatActivity {
         getSupportActionBar().setLogo(R.mipmap.ic_launcher);
         getSupportActionBar().setDisplayUseLogoEnabled(true);
 
+        /*Random random = new Random();
+        int rand = random.nextInt(5);
+        Log.i("RANDOM: ", "" + rand);*/
 
         findViewById(R.id.original_simon_game).setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View view) { playSimonOriginalGame(); }
+            public void onClick(View view) {
+                playSimonOriginalGame();
+            }
         });
 
         findViewById(R.id.simon_trickster_button).setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View view) { playSimonTricksterGame(); }
-        });
-
-        findViewById(R.id.simon_rewind_button_mainactivity).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) { playSimonRewindGame(); }
+            public void onClick(View view) {
+                playSimonTricksterGame();
+            }
         });
 
         findViewById(R.id.about_button).setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View view) { aboutGame(); }
+            public void onClick(View view) {
+                aboutGame();
+            }
         });
+
+
 
         findViewById(R.id.play_button).setOnClickListener(new StartListener());
         findViewById(R.id.pause_button).setOnClickListener(new PauseListener());
         findViewById(R.id.stop_button).setOnClickListener(new StopListener());
 
     }
+
 
     @Override
     protected void onPause() {
@@ -82,11 +89,6 @@ public class MainActivity extends AppCompatActivity {
 
     private void playSimonOriginalGame() {
         Intent intent = new Intent(getApplicationContext(), SimonOriginalGame.class);
-        startActivity(intent);
-    }
-
-    private void playSimonRewindGame() {
-        Intent intent = new Intent(getApplicationContext(), SimonRewindGame.class);
         startActivity(intent);
     }
 
@@ -165,6 +167,7 @@ public class MainActivity extends AppCompatActivity {
         {
             mediaPlayer.stop();
             mediaState = MediaState.STOPPED;
+
         }
     }
 }

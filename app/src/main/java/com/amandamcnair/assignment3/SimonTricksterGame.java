@@ -29,6 +29,7 @@ public class SimonTricksterGame extends AppCompatActivity {
     private TextView scoreText;
     private TextView highestScoreText;
     private int buttonClick;
+    private int choice;
     private int numOfBlocksToClick = 0;
     private int numOfClicks = 0;
 
@@ -46,6 +47,7 @@ public class SimonTricksterGame extends AppCompatActivity {
     private int lose;
     private Animation animation = new AlphaAnimation(1, 0);
 
+    enum MediaState {NOT_READY, PLAYING, PAUSED, STOPPED};
     private MainActivity.MediaState mediaState;
 
     private MediaPlayer mediaPlayer;
@@ -127,7 +129,6 @@ public class SimonTricksterGame extends AppCompatActivity {
             }
         });
 
-        showRulesAlertDialog();
     }
 
     View.OnTouchListener touched = new View.OnTouchListener() {
@@ -383,7 +384,8 @@ public class SimonTricksterGame extends AppCompatActivity {
     class PauseListener implements View.OnClickListener{
         @Override
         public void onClick(View view) {
-            if(mediaPlayer != null) {
+            if(mediaPlayer != null)
+            {
                 mediaPlayer.pause();
                 mediaState = MainActivity.MediaState.PAUSED;
             }
@@ -396,24 +398,6 @@ public class SimonTricksterGame extends AppCompatActivity {
         public void onClick(View view) {
             stopAudio();
         }
-    }
-
-    private void showRulesAlertDialog() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(SimonTricksterGame.this); // need a new one because of running activity
-        builder.setTitle("Simon Trickster");
-        //builder.setMessage("You lost :( \n Click 'Play again!' or 'home' to go back to home.");
-        builder.setMessage("Welcome to Simon Trickster!\n\n " +
-                "Your goal is to repeat the sequence of buttons in the order they appear. " +
-                "But watch out... the button colors are the same, and you may get more than one per turn!\n\n" +
-                "Good luck!\n\n");
-
-        builder.setNegativeButton("LET'S PLAY!", new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int choice) { }
-        });
-
-        AlertDialog dialog = builder.create();
-        dialog.show();
-        dialog.getWindow().setLayout(1100, 800);
     }
 
     private void playAudio()

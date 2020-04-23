@@ -51,7 +51,9 @@ public class SimonOriginalGame extends AppCompatActivity {
     private int lose;
     private Animation animation = new AlphaAnimation(1, 0);
 
+    enum MediaState {NOT_READY, PLAYING, PAUSED, STOPPED};
     private MainActivity.MediaState mediaState;
+
     private MediaPlayer mediaPlayer;
 
     @Override
@@ -134,10 +136,9 @@ public class SimonOriginalGame extends AppCompatActivity {
             }
         });
 
-        showRulesAlertDialog();
     }
 
-    View.OnTouchListener touched = new View.OnTouchListener() {
+        View.OnTouchListener touched = new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
                 if (event.getAction() == MotionEvent.ACTION_DOWN) {
@@ -231,15 +232,15 @@ public class SimonOriginalGame extends AppCompatActivity {
                         findViewById(R.id.yellow_button).startAnimation(animation);
                         //Log.i("PRESSED YELLOW", "Yellow");
                     }
-
                     numOfClicks++;
+
 
                     if (numOfBlocksToClick == numOfClicks) {
 
                         score++;
                         scoreText.setText("Score: " + score);
-                        numOfClicks = 0;
 
+                        numOfClicks = 0;
                         if (numOfBlocksToClick > highestScore) {
                             highestScore = numOfBlocksToClick;
                             // green stuff cannot be the same in another class                 // right here below
@@ -252,13 +253,11 @@ public class SimonOriginalGame extends AppCompatActivity {
                             highestScoreText.setText("High score: " + highestScore);
 
                         }
-
                         final Runnable runnable = new Runnable() {
                             public void run() {
                                 playGame();
                             }
                         };
-
                         handler.postDelayed(runnable, 1000); // without, you can click the same button over and over again and not record your score!
                     }
                 }
@@ -408,29 +407,12 @@ private int j;
         }
     }
 
-    private void showRulesAlertDialog() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(SimonOriginalGame.this); // need a new one because of running activity
-        builder.setTitle("Simon Original");
-        //builder.setMessage("You lost :( \n Click 'Play again!' or 'home' to go back to home.");
-        builder.setMessage("Welcome to Simon Original!\n\n " +
-                "Your goal is to repeat the sequence of buttons in the order they light up.\n\n" +
-                "Good luck!\n\n");
-
-        builder.setNegativeButton("LET'S PLAY!", new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int choice) { }
-        });
-
-        AlertDialog dialog = builder.create();
-        dialog.show();
-        dialog.getWindow().setLayout(1100, 700);
-    }
-
     private void playAudio()
     {
         if(mediaPlayer == null)
         {
             mediaState = MainActivity.MediaState.NOT_READY;
-            mediaPlayer = MediaPlayer.create(getApplicationContext(),R.raw.mushroom_theme_0);
+            mediaPlayer = MediaPlayer.create(getApplicationContext(), R.raw.mushroom_theme_0);
             mediaPlayer.setLooping(true);
 
             mediaPlayer.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
@@ -468,6 +450,7 @@ private int j;
         {
             mediaPlayer.stop();
             mediaState = MainActivity.MediaState.STOPPED;
+
         }
     }
 }

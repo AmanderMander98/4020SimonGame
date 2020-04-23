@@ -11,25 +11,36 @@
 
 
     <TextView
+        android:id="@+id/simon_trickster_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="SIMON"
+        android:textColor="#fff"
+        android:textSize="50sp"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.498"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/stop_button" />
+
+    <TextView
         android:id="@+id/score_textview"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:fontFamily="monospace"
-        android:text="Score: 0"
+        android:text="Score:"
+        android:textSize="30sp"
         android:textColor="#fff"
-        android:textSize="22sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/simonOriginalTV" />
+        app:layout_constraintTop_toBottomOf="@+id/simon_trickster_title" />
 
     <TextView
         android:id="@+id/highestscore_textview"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:fontFamily="monospace"
         android:text="Highest Score:"
+        android:textSize="30sp"
         android:textColor="#fff"
-        android:textSize="22sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/score_textview" />
@@ -38,11 +49,10 @@
         android:id="@+id/start_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:background="#000"
-        android:fontFamily="monospace"
-        android:text="[ START ]"
-        android:textColor="#fff"
+        android:text="START"
         android:textSize="30sp"
+        android:textColor="#fff"
+        android:background="#000"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -52,7 +62,7 @@
         android:id="@+id/blue_button"
         android:layout_width="126dp"
         android:layout_height="116dp"
-        android:layout_marginStart="52dp"
+        android:layout_marginStart="60dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/red_button"
@@ -96,12 +106,10 @@
         android:id="@+id/play_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:background="?android:attr/selectableItemBackground"
         android:text="PLAY"
         android:textColor="#fff"
         android:textSize="20sp"
-        app:layout_constraintEnd_toStartOf="@+id/pause_button"
+        android:background="?android:attr/selectableItemBackground"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -109,12 +117,11 @@
         android:id="@+id/pause_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
+        android:layout_marginStart="88dp"
         android:background="?android:attr/selectableItemBackground"
         android:text="PAUSE"
         android:textColor="#fff"
         android:textSize="20sp"
-        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -122,22 +129,12 @@
         android:id="@+id/stop_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
+        android:layout_marginStart="176dp"
         android:background="?android:attr/selectableItemBackground"
         android:text="STOP"
         android:textColor="#fff"
         android:textSize="20sp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/pause_button"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <ImageView
-        android:id="@+id/simonOriginalTV"
-        android:layout_width="276dp"
-        android:layout_height="113dp"
-        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/stop_button"
-        app:srcCompat="@drawable/simon_original_name" />
+        app:layout_constraintTop_toTopOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

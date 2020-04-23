@@ -531,4 +531,5 @@ public class SimonRewindGame extends AppCompatActivity {
             mediaState = MainActivity.MediaState.STOPPED;
         }
     }
+
 }
