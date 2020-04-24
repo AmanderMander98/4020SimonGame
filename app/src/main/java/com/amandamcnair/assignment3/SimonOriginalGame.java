@@ -25,11 +25,20 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import java.util.HashSet;
 
+/*
+
+ Overview: when start button is clicked, play the animation of buttons user should click.
+ If correct button is clicked, add 1 to button sequence and move on to next turn until win.
+ Else, cancel the turn and end game.
+
+ */
+
 public class SimonOriginalGame extends AppCompatActivity {
 
     public MainActivity.MediaState mediaState;
     public MediaPlayer mediaPlayer;
 
+    //use helper class objects
     private GameValues OGV = new GameValues();
     private SimonAlertDialogHelper adHelper = new SimonAlertDialogHelper();
 
@@ -38,6 +47,7 @@ public class SimonOriginalGame extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.simonoriginalgame);
 
+        //set listeners and action bar setup
         getSupportActionBar().setDisplayShowHomeEnabled(true);
         getSupportActionBar().setLogo(R.mipmap.ic_launcher);
         getSupportActionBar().setDisplayUseLogoEnabled(true);
@@ -46,6 +56,7 @@ public class SimonOriginalGame extends AppCompatActivity {
         findViewById(R.id.pause_button).setOnClickListener(new PauseListener());
         findViewById(R.id.stop_button).setOnClickListener(new StopListener());
 
+        //use sharedpreferences to save the high score
         SharedPreferences simonRewindPrefs = this.getSharedPreferences("HIGHSCORESimonOriginal", getApplicationContext().MODE_PRIVATE);
         OGV.highestScore = simonRewindPrefs.getInt("HIGHSCORESimonOriginal", 0);
         runOnUiThread(new Runnable() {
@@ -101,12 +112,16 @@ public class SimonOriginalGame extends AppCompatActivity {
         adHelper.showRulesAlertDialog();
     }
 
+    //onclicklistener for all four buttons
     View.OnClickListener onClick = new View.OnClickListener() {
         @Override
         public void onClick(View view) {
             Log.i("OnClickListener", "animationIsRunning: " + OGV.animationIsRunning + " v.id = " + view.getId());
+
+            //if not in the middle of animation,
             if (!OGV.animationIsRunning) {
 
+                //set up a new thread with buttonclicktask class
                 OGV.currentButton = view;
                 Log.i("OnClickListener", "currentButton: " + OGV.currentButton);
                 OGV.buttonClickedForThisRound = true;
@@ -120,9 +135,10 @@ public class SimonOriginalGame extends AppCompatActivity {
                         Looper.loop();
                     }
                 };
-
+                //start the new thread
                 t.start();
             } else {
+                //otherwise, just display an error toast
                 adHelper.animationRunningToast();
             }
         }
@@ -133,7 +149,8 @@ public class SimonOriginalGame extends AppCompatActivity {
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-
+                //check for new high score. if so,
+                // save to sharedPreferences and update the textview.
                 if (OGV.score >= OGV.highestScore) {
                     OGV.highestScore = OGV.score;
                     adHelper.highScoreToast();
@@ -158,11 +175,12 @@ public class SimonOriginalGame extends AppCompatActivity {
             @Override
             public void run() {
                 try {
-                    Thread.sleep(750);
+                    Thread.sleep(750);  // sleep for a moment before beginning
                     for (int j = 0; j < OGV.numOfBlocksToClick; j++) {
                         // this is the computer creating the button animations
                         Log.i("Loop start", "j = " + j + " OGV.numOfBlocksToClick = " + OGV.numOfBlocksToClick);
 
+                        //play appropriate animation and sound for each button in sequence
                         if (OGV.plays[j] == 1) {
                             runAnimationAndPlaySound(findViewById(R.id.red_button), OGV.bell);
                         } else if (OGV.plays[j] == 2) {
@@ -175,9 +193,12 @@ public class SimonOriginalGame extends AppCompatActivity {
 
                         Log.i("Loop end", "OGV.plays[j] = " + OGV.plays[j]);
 
+                        //sleep for 1 second between button animations
                         Thread.sleep(1000);
 
                     }
+
+                    //signify animation is done, and enable buttons
                     OGV.animationIsRunning = false;
                     enableButtons();
                 } catch (InterruptedException e) {
@@ -186,10 +207,12 @@ public class SimonOriginalGame extends AppCompatActivity {
             }
         };
 
+        //start the new thread
         new Thread(runnable).start();
     }
 
     private void initializePlays() {
+        //set up the array for the button sequence
         for (int i = 0; i < 20; i++) {
             if (OGV.plays[i] == 0 || OGV.plays == null) {
                 OGV.plays[i] = OGV.random.nextInt(4) + 1;  // 1 -4
@@ -197,6 +220,7 @@ public class SimonOriginalGame extends AppCompatActivity {
         }
     }
 
+    // activated upon clicking one of the buttons
     class ButtonClickTask implements Runnable {
         private boolean rightButtonClicked = true;
         private boolean finishedTheRound = false;
@@ -207,12 +231,12 @@ public class SimonOriginalGame extends AppCompatActivity {
 
         @Override
         public void run() {
+            //in background thread
 
-            //do the ontouchlistener stuff
+            //determine which button was clicked
             switch (OGV.currentButton.getId()) {
                 case R.id.red_button:
                     OGV.buttonClick = 1;
-                    //playSound(OGV.bell);
                     break;
                 case R.id.green_button:
                     OGV.buttonClick = 2;
@@ -225,68 +249,67 @@ public class SimonOriginalGame extends AppCompatActivity {
                     break;
             }
 
+            //if the clicked button does NOT match the button
+            //at this place in the sequence
             if (OGV.plays[OGV.numOfClicks] != OGV.buttonClick) {
                 Log.i("Player lost.", "");
                 rightButtonClicked = false;
 
+                //end turn, disable buttons, show alertdialog
                 cancelTurn();
                 playSound(OGV.lose);
                 disableButtons();
                 adHelper.gameOverAlertDialog();
 
-            } else {
+            } else { //otherwise, they clicked the right button
                 rightButtonClicked = true;
 
+                //animate appropriate button and sound for the clicked button
                 if (OGV.currentButton.getId() == R.id.red_button) {
                     buttonToAnimate = R.id.red_button;
                     soundToPlay = OGV.bell;
                 } else if (OGV.currentButton.getId() == R.id.green_button) {
-                    //runAnimationAndPlaySound(findViewById(R.id.green_button_sr), OGV.ding);
                     buttonToAnimate = R.id.green_button;
                     soundToPlay = OGV.ding;
                 } else if (OGV.currentButton.getId() == R.id.blue_button) {
-                    //runAnimationAndPlaySound(findViewById(R.id.blue_button_sr), OGV.dong);
                     buttonToAnimate = R.id.blue_button;
                     soundToPlay = OGV.dong;
                 } else if (OGV.currentButton.getId() == R.id.yellow_button) {
-                    //runAnimationAndPlaySound(findViewById(R.id.yellow_button_sr), OGV.high_ding);
                     buttonToAnimate = R.id.yellow_button;
                     soundToPlay = OGV.high_ding;
                 }
 
+                //add a click for this round and activate animation
                 OGV.numOfClicks++;
                 runAnimationAndPlaySound(findViewById(buttonToAnimate), soundToPlay);
 
+                //if this is the end of this round
                 if (OGV.numOfBlocksToClick == OGV.numOfClicks) {
                     finishedTheRound = true;
 
+                    //increment score and reset clicks
                     OGV.score++;
                     OGV.numOfClicks = 0;
-                    //disableButtons();
 
+                    //if they beat their score, new high score.
+                    //show in textview, and save in sharedpreferences.
                     if (OGV.numOfBlocksToClick > OGV.highestScore) {
                         newHighScore = true;
                         OGV.highestScore = OGV.numOfBlocksToClick;
 
-                        // green stuff cannot be the same in another class                 // right here below
+                        // save high score in unique sharedpreferences object
                         SharedPreferences highScoresSimonRewind = getSharedPreferences("HIGHSCORESimonOriginal", Context.MODE_PRIVATE);
                         SharedPreferences.Editor editorSimonRewind = highScoresSimonRewind.edit();
-                        // right here below
                         editorSimonRewind.putInt("HIGHSCORESimonOriginal", OGV.highestScore);
                         editorSimonRewind.commit();
                     }
                 }
             }
 
-
-            Log.i("Button clicked: ", "" + OGV.buttonClick);
-            Log.i("Right button clicked: ", "" + rightButtonClicked);
-            Log.i("Finished the round: ", "" + finishedTheRound);
-            Log.i("New high score: ", "" + newHighScore);
-
-
+            //if the round is done,
             if (finishedTheRound) {
-
+                //check if they won. if so, end game.
+                //otherwise, go on to next turn.
                 if (OGV.score == OGV.winningScore) {
                     adHelper.gameWonAlertDialog();
                     cancelTurn();
@@ -305,9 +328,8 @@ public class SimonOriginalGame extends AppCompatActivity {
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    Log.i("runOnUiThread", "rightButtonclicked: " + rightButtonClicked
-                            + " finishedTheround: " + finishedTheRound
-                            + " newHighScore: " + newHighScore);
+
+                    //update UI as needed in main thread
                     if (!rightButtonClicked) {
                         playSound(OGV.lose);
                         findViewById(R.id.start_button).setEnabled(true);
@@ -324,9 +346,11 @@ public class SimonOriginalGame extends AppCompatActivity {
                 }
             });
 
+            // when done, set all booleans back to false
+            // to prep for next turn.
             OGV.buttonClickedForThisRound = false;
             setAllBoolsToFalse();
-            //when done, set all booleans back to false
+
         }
 
         private void setAllBoolsToFalse() {

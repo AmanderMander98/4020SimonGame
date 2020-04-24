@@ -25,10 +25,21 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import java.util.HashSet;
 
+/*
+
+ Overview: when start button is clicked, play the animation of buttons user should click.
+ If correct button is clicked, add 1 to button sequence and move on to next turn until win.
+ Else, cancel the turn and end game.
+
+ Note: Logic is same as Simon Original. Just same color buttons and same sounds.
+
+ */
+
 public class SimonTricksterGame extends AppCompatActivity {
     public MainActivity.MediaState mediaState;
     public MediaPlayer mediaPlayer;
 
+    //use helper class objects
     private GameValues TGV = new GameValues();
     private SimonAlertDialogHelper adHelper = new SimonAlertDialogHelper();
 
@@ -37,6 +48,7 @@ public class SimonTricksterGame extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.simontrickstergame);
 
+        //set listeners and action bar setup
         getSupportActionBar().setDisplayShowHomeEnabled(true);
         getSupportActionBar().setLogo(R.mipmap.ic_launcher);
         getSupportActionBar().setDisplayUseLogoEnabled(true);
@@ -45,6 +57,7 @@ public class SimonTricksterGame extends AppCompatActivity {
         findViewById(R.id.pause_button).setOnClickListener(new PauseListener());
         findViewById(R.id.stop_button).setOnClickListener(new StopListener());
 
+        //use sharedpreferences to save the high score
         SharedPreferences simonRewindPrefs = this.getSharedPreferences("HIGHSCORESimonTrickster", getApplicationContext().MODE_PRIVATE);
         TGV.highestScore = simonRewindPrefs.getInt("HIGHSCORESimonTrickster", 0);
         runOnUiThread(new Runnable() {
@@ -99,12 +112,16 @@ public class SimonTricksterGame extends AppCompatActivity {
         adHelper.showRulesAlertDialog();
     }
 
+    //onclicklistener for all four buttons
     View.OnClickListener onClick = new View.OnClickListener() {
         @Override
         public void onClick(View view) {
             Log.i("OnClickListener", "animationIsRunning: " + TGV.animationIsRunning + " v.id = " + view.getId());
+
+            //if not in the middle of animation,
             if (!TGV.animationIsRunning) {
 
+                //set up a new thread with buttonclicktask class
                 TGV.currentButton = view;
                 Log.i("OnClickListener", "currentButton: " + TGV.currentButton);
                 TGV.buttonClickedForThisRound = true;
@@ -119,8 +136,10 @@ public class SimonTricksterGame extends AppCompatActivity {
                     }
                 };
 
+                //start the new thread
                 t.start();
             } else {
+                //otherwise, just display an error toast
                 adHelper.animationRunningToast();
             }
         }
@@ -131,6 +150,8 @@ public class SimonTricksterGame extends AppCompatActivity {
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
+                //check for new high score. if so,
+                // save to sharedPreferences and update the textview.
                 if (TGV.score >= TGV.highestScore) {
                     TGV.highestScore = TGV.score;
                     adHelper.highScoreToast();
@@ -156,11 +177,12 @@ public class SimonTricksterGame extends AppCompatActivity {
             public void run() {
 
                 try {
-                    Thread.sleep(750);
+                    Thread.sleep(750);  // sleep for a moment before beginning
                     for (int j = 0; j < TGV.numOfBlocksToClick; j++) {
                         // this is the computer creating the button animations
                         Log.i("Loop start", "j = " + j + " TGV.numOfBlocksToClick = " + TGV.numOfBlocksToClick);
 
+                        //play appropriate animation and sound for each button in sequence
                         if (TGV.plays[j] == 1) {
                             runAnimationAndPlaySound(findViewById(R.id.red_button), TGV.bell);
                         } else if (TGV.plays[j] == 2) {
@@ -173,9 +195,11 @@ public class SimonTricksterGame extends AppCompatActivity {
 
                         Log.i("Loop end", "TGV.plays[j] = " + TGV.plays[j]);
 
+                        //sleep for 1 second between button animations
                         Thread.sleep(1000);
 
                     }
+                    //signify animation is done, and enable buttons
                     TGV.animationIsRunning = false;
                     enableButtons();
                 } catch (InterruptedException e) {
@@ -184,10 +208,12 @@ public class SimonTricksterGame extends AppCompatActivity {
             }
         };
 
+        //start the new thread
         new Thread(runnable).start();
     }
 
     private void initializePlays() {
+        //set up the array for the button sequence
         for (int i = 0; i < 20; i++) {
             if (TGV.plays[i] == 0 || TGV.plays == null) {
                 TGV.plays[i] = TGV.random.nextInt(4) + 1;  // 1 -4
@@ -195,6 +221,7 @@ public class SimonTricksterGame extends AppCompatActivity {
         }
     }
 
+    // activated upon clicking one of the buttons
     class ButtonClickTask implements Runnable {
         private boolean rightButtonClicked = true;
         private boolean finishedTheRound = false;
@@ -205,12 +232,12 @@ public class SimonTricksterGame extends AppCompatActivity {
 
         @Override
         public void run() {
+            //in background thread
 
-            //do the ontouchlistener stuff
+            //determine which button was clicked
             switch (TGV.currentButton.getId()) {
                 case R.id.red_button:
                     TGV.buttonClick = 1;
-                    //playSound(TGV.bell);
                     break;
                 case R.id.green_button:
                     TGV.buttonClick = 2;
@@ -223,68 +250,67 @@ public class SimonTricksterGame extends AppCompatActivity {
                     break;
             }
 
+            //if the clicked button does NOT match the button
+            //at this place in the sequence
             if (TGV.plays[TGV.numOfClicks] != TGV.buttonClick) {
                 Log.i("Player lost.", "");
                 rightButtonClicked = false;
 
+                //end turn, disable buttons, show alertdialog
                 cancelTurn();
                 playSound(TGV.lose);
                 disableButtons();
                 adHelper.gameOverAlertDialog();
 
-            } else {
+            } else { //otherwise, they clicked the right button
                 rightButtonClicked = true;
 
+                //animate appropriate button and sound for the clicked button
                 if (TGV.currentButton.getId() == R.id.red_button) {
                     buttonToAnimate = R.id.red_button;
                     soundToPlay = TGV.bell;
                 } else if (TGV.currentButton.getId() == R.id.green_button) {
-                    //runAnimationAndPlaySound(findViewById(R.id.green_button_sr), TGV.ding);
                     buttonToAnimate = R.id.green_button;
                     soundToPlay = TGV.ding;
                 } else if (TGV.currentButton.getId() == R.id.blue_button) {
-                    //runAnimationAndPlaySound(findViewById(R.id.blue_button_sr), TGV.dong);
                     buttonToAnimate = R.id.blue_button;
                     soundToPlay = TGV.dong;
                 } else if (TGV.currentButton.getId() == R.id.yellow_button) {
-                    //runAnimationAndPlaySound(findViewById(R.id.yellow_button_sr), TGV.high_ding);
                     buttonToAnimate = R.id.yellow_button;
                     soundToPlay = TGV.high_ding;
                 }
 
+                //add a click for this round and activate animation
                 TGV.numOfClicks++;
                 runAnimationAndPlaySound(findViewById(buttonToAnimate), soundToPlay);
 
+                //if this is the end of this round
                 if (TGV.numOfBlocksToClick == TGV.numOfClicks) {
                     finishedTheRound = true;
 
+                    //increment score and reset clicks
                     TGV.score++;
                     TGV.numOfClicks = 0;
-                    //disableButtons();
 
+                    //if they beat their score, new high score.
+                    //show in textview, and save in sharedpreferences.
                     if (TGV.numOfBlocksToClick > TGV.highestScore) {
                         newHighScore = true;
                         TGV.highestScore = TGV.numOfBlocksToClick;
 
-                        // green stuff cannot be the same in another class                 // right here below
+                        // save high score in unique sharedpreferences object
                         SharedPreferences highScoresSimonRewind = getSharedPreferences("HIGHSCORESimonTrickster", Context.MODE_PRIVATE);
                         SharedPreferences.Editor editorSimonRewind = highScoresSimonRewind.edit();
-                        // right here below
                         editorSimonRewind.putInt("HIGHSCORESimonTrickster", TGV.highestScore);
                         editorSimonRewind.commit();
                     }
                 }
             }
 
-
-            Log.i("Button clicked: ", "" + TGV.buttonClick);
-            Log.i("Right button clicked: ", "" + rightButtonClicked);
-            Log.i("Finished the round: ", "" + finishedTheRound);
-            Log.i("New high score: ", "" + newHighScore);
-
-
+            //if the round is done,
             if (finishedTheRound) {
-
+                //check if they won. if so, end game.
+                //otherwise, go on to next turn.
                 if (TGV.score == TGV.winningScore) {
                     adHelper.gameWonAlertDialog();
                 } else {
@@ -302,9 +328,7 @@ public class SimonTricksterGame extends AppCompatActivity {
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    Log.i("runOnUiThread", "rightButtonclicked: " + rightButtonClicked
-                            + " finishedTheround: " + finishedTheRound
-                            + " newHighScore: " + newHighScore);
+                    //update UI as needed in main thread
                     if (!rightButtonClicked) {
                         playSound(TGV.lose);
                         findViewById(R.id.start_button).setEnabled(true);
@@ -321,9 +345,11 @@ public class SimonTricksterGame extends AppCompatActivity {
                 }
             });
 
+            // when done, set all booleans back to false
+            // to prep for next turn.
             TGV.buttonClickedForThisRound = false;
             setAllBoolsToFalse();
-            //when done, set all booleans back to false
+
         }
 
         private void setAllBoolsToFalse() {

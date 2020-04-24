@@ -26,11 +26,23 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import java.util.HashSet;
 
+/*
+
+ Overview: when start button is clicked, play the animation of buttons user should click.
+ If correct button is clicked, add 1 to button sequence and move on to next turn until win.
+ Else, cancel the turn and end game.
+
+ Note: to see if correct button is clicked, we check if plays[score - numOfClicks] != buttonClick
+ rather than plays[numofclicks] as in Simon Original. This checks the array in reverse order.
+
+ */
+
 public class SimonRewindGame extends AppCompatActivity {
 
     public MainActivity.MediaState mediaState;
     public MediaPlayer mediaPlayer;
 
+    //use helper class objects
     private GameValues RGV = new GameValues();
     private SimonAlertDialogHelper adHelper = new SimonAlertDialogHelper();
 
@@ -39,6 +51,7 @@ public class SimonRewindGame extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.simonrewindgame);
 
+        //set listeners and action bar setup
         getSupportActionBar().setDisplayShowHomeEnabled(true);
         getSupportActionBar().setLogo(R.mipmap.ic_launcher);
         getSupportActionBar().setDisplayUseLogoEnabled(true);
@@ -47,6 +60,7 @@ public class SimonRewindGame extends AppCompatActivity {
         findViewById(R.id.pause_button_sr).setOnClickListener(new PauseListener());
         findViewById(R.id.stop_button_sr).setOnClickListener(new StopListener());
 
+        //use sharedpreferences to save the high score
         SharedPreferences simonRewindPrefs = this.getSharedPreferences("HIGHSCORESimonRewind", getApplicationContext().MODE_PRIVATE);
         // right here below
         RGV.highestScore = simonRewindPrefs.getInt("HIGHSCORESimonRewind", 0);
@@ -112,13 +126,16 @@ public class SimonRewindGame extends AppCompatActivity {
         }
     };
 
-
+    //onclicklistener for all four buttons
     View.OnClickListener onClick = new View.OnClickListener() {
         @Override
         public void onClick(View view) {
             Log.i("OnClickListener", "animationIsRunning: " + RGV.animationIsRunning + " v.id = " + view.getId());
+
+            //if not in the middle of animation,
             if (!RGV.animationIsRunning) {
 
+                //set up a new thread with buttonclicktask class
                 RGV.currentButton = view;
                 Log.i("OnClickListener", "currentButton: " + RGV.currentButton);
                 RGV.buttonClickedForThisRound = true;
@@ -132,9 +149,10 @@ public class SimonRewindGame extends AppCompatActivity {
                         Looper.loop();
                     }
                 };
-
+                //start the new thread
                 t.start();
             } else {
+                //otherwise, just display an error toast
                 adHelper.animationRunningToast();
             }
         }
@@ -145,6 +163,8 @@ public class SimonRewindGame extends AppCompatActivity {
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
+                //check for new high score. if so,
+                // save to sharedPreferences and update the textview.
                 if (RGV.score >= RGV.highestScore) {
                     RGV.highestScore = RGV.score;
                     adHelper.highScoreToast();
@@ -170,12 +190,12 @@ public class SimonRewindGame extends AppCompatActivity {
             public void run() {
 
                 try {
-                    Thread.sleep(750);
+                    Thread.sleep(750);  // sleep for a moment before beginning
                     for (int j = 0; j < RGV.numOfBlocksToClick; j++) {
                         // this is the computer creating the button animations
                         Log.i("Loop start", "j = " + j + " RGV.numOfBlocksToClick = " + RGV.numOfBlocksToClick);
 
-                        //runOnUiThread(new Runn);
+                        //play appropriate animation and sound for each button in sequence
                         if (RGV.plays[j] == 1) {
                             runAnimationAndPlaySound(findViewById(R.id.red_button_sr), RGV.bell);
                         } else if (RGV.plays[j] == 2) {
@@ -188,9 +208,11 @@ public class SimonRewindGame extends AppCompatActivity {
 
                         Log.i("Loop end", "RGV.plays[j] = " + RGV.plays[j]);
 
+                        //sleep for 1 second between button animations
                         Thread.sleep(1000);
 
                     }
+                    //signify animation is done, and enable buttons
                     RGV.animationIsRunning = false;
                     enableButtons();
                 } catch (InterruptedException e) {
@@ -199,10 +221,12 @@ public class SimonRewindGame extends AppCompatActivity {
             }
         };
 
+        //start the new thread
         new Thread(runnable).start();
     }
 
     private void initializePlays() {
+        //set up the array for the button sequence
         for (int i = 0; i < 20; i++) {
             if (RGV.plays[i] == 0 || RGV.plays == null) {
                 RGV.plays[i] = RGV.random.nextInt(4) + 1;  // 1 -4
@@ -210,6 +234,7 @@ public class SimonRewindGame extends AppCompatActivity {
         }
     }
 
+    // activated upon clicking one of the buttons
     class ButtonClickTask implements Runnable {
         private boolean rightButtonClicked = true;
         private boolean finishedTheRound = false;
@@ -220,12 +245,12 @@ public class SimonRewindGame extends AppCompatActivity {
 
         @Override
         public void run() {
+            //in background thread
 
-            //do the ontouchlistener stuff
+            //determine which button was clicked
             switch (RGV.currentButton.getId()) {
                 case R.id.red_button_sr:
                     RGV.buttonClick = 1;
-                    //playSound(RGV.bell);
                     break;
                 case R.id.green_button_sr:
                     RGV.buttonClick = 2;
@@ -238,69 +263,68 @@ public class SimonRewindGame extends AppCompatActivity {
                     break;
             }
 
+            //if the clicked button does NOT match the button
+            //at this place in the sequence
             if (RGV.plays[(RGV.score - RGV.numOfClicks)] != RGV.buttonClick) {
                 Log.i("Player lost.", "");
                 rightButtonClicked = false;
 
+                //end turn, disable buttons, show alertdialog
                 cancelTurn();
                 playSound(RGV.lose);
                 disableButtons();
                 adHelper.gameOverAlertDialog();
                 //break;
 
-            } else {
+            } else { //otherwise, they clicked the right button
                 rightButtonClicked = true;
 
+                //animate appropriate button and sound for the clicked button
                 if (RGV.currentButton.getId() == R.id.red_button_sr) {
                     buttonToAnimate = R.id.red_button_sr;
                     soundToPlay = RGV.bell;
                 } else if (RGV.currentButton.getId() == R.id.green_button_sr) {
-                    //runAnimationAndPlaySound(findViewById(R.id.green_button_sr), RGV.ding);
                     buttonToAnimate = R.id.green_button_sr;
                     soundToPlay = RGV.ding;
                 } else if (RGV.currentButton.getId() == R.id.blue_button_sr) {
-                    //runAnimationAndPlaySound(findViewById(R.id.blue_button_sr), RGV.dong);
                     buttonToAnimate = R.id.blue_button_sr;
                     soundToPlay = RGV.dong;
                 } else if (RGV.currentButton.getId() == R.id.yellow_button_sr) {
-                    //runAnimationAndPlaySound(findViewById(R.id.yellow_button_sr), RGV.high_ding);
                     buttonToAnimate = R.id.yellow_button_sr;
                     soundToPlay = RGV.high_ding;
                 }
 
+                //add a click for this round and activate animation
                 RGV.numOfClicks++;
                 runAnimationAndPlaySound(findViewById(buttonToAnimate), soundToPlay);
 
+                //if this is the end of this round
                 if (RGV.numOfBlocksToClick == RGV.numOfClicks) {
                     finishedTheRound = true;
 
+                    //increment score and reset clicks
                     RGV.score++;
                     RGV.numOfClicks = 0;
-                    //disableButtons();
 
+                    //if they beat their score, new high score.
+                    //show in textview, and save in sharedpreferences.
                     if (RGV.numOfBlocksToClick > RGV.highestScore) {
                         newHighScore = true;
                         RGV.highestScore = RGV.numOfBlocksToClick;
 
-                        // green stuff cannot be the same in another class                 // right here below
+                        // save high score in unique sharedpreferences object
                         SharedPreferences highScoresSimonRewind = getSharedPreferences("HIGHSCORESimonRewind", Context.MODE_PRIVATE);
                         SharedPreferences.Editor editorSimonRewind = highScoresSimonRewind.edit();
-                        // right here below
                         editorSimonRewind.putInt("HIGHSCORESimonRewind", RGV.highestScore);
                         editorSimonRewind.commit();
                     }
                 }
             }
 
-
-            Log.i("Button clicked: ", "" + RGV.buttonClick);
-            Log.i("Right button clicked: ", "" + rightButtonClicked);
-            Log.i("Finished the round: ", "" + finishedTheRound);
-            Log.i("New high score: ", "" + newHighScore);
-
-
+            //if the round is done,
             if (finishedTheRound) {
-
+                //check if they won. if so, end game.
+                //otherwise, go on to next turn.
                 if (RGV.score == RGV.winningScore) {
                     adHelper.gameWonAlertDialog();
                 } else {
@@ -318,9 +342,7 @@ public class SimonRewindGame extends AppCompatActivity {
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    Log.i("runOnUiThread", "rightButtonclicked: " + rightButtonClicked
-                            + " finishedTheround: " + finishedTheRound
-                            + " newHighScore: " + newHighScore);
+                    //update UI as needed in main thread
                     if (!rightButtonClicked) {
                         playSound(RGV.lose);
                         //disableButtons();
@@ -338,8 +360,8 @@ public class SimonRewindGame extends AppCompatActivity {
                 }
             });
 
-            //when done, set all booleans back to false
-
+            // when done, set all booleans back to false
+            // to prep for next turn.
             RGV.buttonClickedForThisRound = false;
             setAllBoolsToFalse();
         }
