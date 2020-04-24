@@ -483,7 +483,8 @@ public class SimonTricksterGame extends AppCompatActivity {
             builder.setTitle("Simon Rewind");
             //builder.setMessage("You lost :( \n Click 'Play again!' or 'home' to go back to home.");
             builder.setMessage("Welcome to Simon Rewind!\n\n " +
-                    "Your goal is to repeat the sequence of buttons in REVERSE order.\n\n" +
+                    "Your goal is to repeat the sequence of buttons in the order in which they appear." +
+                    " But watch out-- the button colors and sounds are the same!\n\n" +
                     "Good luck!\n\n");
 
             builder.setNegativeButton("LET'S PLAY!", new DialogInterface.OnClickListener() {
@@ -496,7 +497,7 @@ public class SimonTricksterGame extends AppCompatActivity {
             //user can't click out of alertdialog
             dialog.setCanceledOnTouchOutside(false);
             dialog.show();
-            dialog.getWindow().setLayout(1100, 700);
+            dialog.getWindow().setLayout(1100, 750);
         }
 
         private void gameWonAlertDialog() {
