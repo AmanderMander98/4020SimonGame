@@ -12,10 +12,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
-import android.view.MotionEvent;
 import android.view.View;
-import android.view.animation.AlphaAnimation;
-import android.view.animation.Animation;
 import android.view.animation.LinearInterpolator;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -23,14 +20,13 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 
 import java.util.HashSet;
-import java.util.Random;
-import java.util.Set;
 
 public class SimonTricksterGame extends AppCompatActivity {
     public MainActivity.MediaState mediaState;
     public MediaPlayer mediaPlayer;
 
-    private GameValues RGV = new GameValues();
+    private GameValues TGV = new GameValues();
+    private SimonAlertDialogHelper adHelper = new SimonAlertDialogHelper();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,17 +42,17 @@ public class SimonTricksterGame extends AppCompatActivity {
         findViewById(R.id.stop_button).setOnClickListener(new StopListener());
 
         SharedPreferences simonRewindPrefs = this.getSharedPreferences("HIGHSCORESimonTrickster", getApplicationContext().MODE_PRIVATE);
-        RGV.highestScore = simonRewindPrefs.getInt("HIGHSCORESimonTrickster", 0);
+        TGV.highestScore = simonRewindPrefs.getInt("HIGHSCORESimonTrickster", 0);
         runOnUiThread(new Runnable() {
             public void run() {
                 TextView tv = findViewById(R.id.highestscore_textview);
-                tv.setText("High score: " + RGV.highestScore);
-                Log.i("HIGH SCORE", "High score: " + RGV.highestScore);
+                tv.setText("High score: " + TGV.highestScore);
+                Log.i("HIGH SCORE", "High score: " + TGV.highestScore);
             }
         });
 
 
-        RGV.soundsLoaded = new HashSet<>();
+        TGV.soundsLoaded = new HashSet<>();
 
         AudioAttributes.Builder attributeBuilder = new AudioAttributes.Builder();
         attributeBuilder.setUsage(AudioAttributes.USAGE_GAME);
@@ -66,12 +62,12 @@ public class SimonTricksterGame extends AppCompatActivity {
 
         spBuilder.setMaxStreams(1);
 
-        RGV.soundPool = spBuilder.build();
-        RGV.soundPool.setOnLoadCompleteListener(new SoundPool.OnLoadCompleteListener() {
+        TGV.soundPool = spBuilder.build();
+        TGV.soundPool.setOnLoadCompleteListener(new SoundPool.OnLoadCompleteListener() {
             @Override
             public void onLoadComplete(SoundPool soundPool, int sampleID, int status) {
                 if (status == 0) { // success
-                    RGV.soundsLoaded.add(sampleID);
+                    TGV.soundsLoaded.add(sampleID);
                     Log.i("SOUND", "Sound loaded " + sampleID);
                 } else {
                     Log.i("SOUND", "Error cannot load sound status = " + status);
@@ -79,8 +75,8 @@ public class SimonTricksterGame extends AppCompatActivity {
             }
         });
 
-        RGV.scoreText = findViewById(R.id.score_textview);
-        RGV.highestScoreText = findViewById(R.id.highestscore_textview);
+        TGV.scoreText = findViewById(R.id.score_textview);
+        TGV.highestScoreText = findViewById(R.id.highestscore_textview);
 
         loadSoundPoolSounds();
 
@@ -96,30 +92,32 @@ public class SimonTricksterGame extends AppCompatActivity {
             }
         });
 
-        showRulesAlertDialog();
+        adHelper.showRulesAlertDialog();
     }
 
     View.OnClickListener onClick = new View.OnClickListener() {
         @Override
         public void onClick(View view) {
-            Log.i("OnClickListener", "animationIsRunning: " + RGV.animationIsRunning + " v.id = " + view.getId());
-            if (!RGV.animationIsRunning) {
+            Log.i("OnClickListener", "animationIsRunning: " + TGV.animationIsRunning + " v.id = " + view.getId());
+            if (!TGV.animationIsRunning) {
 
-                RGV.currentButton = view;
-                Log.i("OnClickListener", "currentButton: " + RGV.currentButton);
-                RGV.buttonClickedForThisRound = true;
+                TGV.currentButton = view;
+                Log.i("OnClickListener", "currentButton: " + TGV.currentButton);
+                TGV.buttonClickedForThisRound = true;
 
                 Thread t = new Thread() {
                     @Override
                     public void run() {
                         Looper.prepare();
-                        RGV.buttonPressHandler = new Handler();
-                        RGV.buttonPressHandler.post(new ButtonClickTask());
+                        TGV.buttonPressHandler = new Handler();
+                        TGV.buttonPressHandler.post(new ButtonClickTask());
                         Looper.loop();
                     }
                 };
 
                 t.start();
+            } else {
+                adHelper.animationRunningToast();
             }
         }
     };
@@ -129,25 +127,25 @@ public class SimonTricksterGame extends AppCompatActivity {
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                if (RGV.score >= RGV.highestScore) {
-                    RGV.highestScore = RGV.score;
-                    highScoreToast();
+                if (TGV.score >= TGV.highestScore) {
+                    TGV.highestScore = TGV.score;
+                    adHelper.highScoreToast();
 
                     SharedPreferences highScoresSimonOriginal = getSharedPreferences("HIGHSCORESimonOriginal", Context.MODE_PRIVATE);
                     SharedPreferences.Editor editorSimonOriginal = highScoresSimonOriginal.edit();
 
-                    editorSimonOriginal.putInt("HIGHSCORESimonOriginal", RGV.highestScore);
+                    editorSimonOriginal.putInt("HIGHSCORESimonOriginal", TGV.highestScore);
                     editorSimonOriginal.commit();
 
                     TextView tv = findViewById(R.id.highestscore_textview);
-                    tv.setText("High score: " + RGV.highestScore);
-                    Log.i("HIGH SCORE", "High score: " + RGV.highestScore);
+                    tv.setText("High score: " + TGV.highestScore);
+                    Log.i("HIGH SCORE", "High score: " + TGV.highestScore);
                 }
             }
         });
 
         initializePlays();
-        RGV.animationIsRunning = true;
+        TGV.animationIsRunning = true;
 
         final Runnable runnable = new Runnable() {
             @Override
@@ -155,26 +153,26 @@ public class SimonTricksterGame extends AppCompatActivity {
 
                 try {
                     Thread.sleep(750);
-                    for (int j = 0; j < RGV.numOfBlocksToClick; j++) {
+                    for (int j = 0; j < TGV.numOfBlocksToClick; j++) {
                         // this is the computer creating the button animations
-                        Log.i("Loop start", "j = " + j + " RGV.numOfBlocksToClick = " + RGV.numOfBlocksToClick);
+                        Log.i("Loop start", "j = " + j + " TGV.numOfBlocksToClick = " + TGV.numOfBlocksToClick);
 
-                        if (RGV.plays[j] == 1) {
-                            runAnimationAndPlaySound(findViewById(R.id.red_button), RGV.bell);
-                        } else if (RGV.plays[j] == 2) {
-                            runAnimationAndPlaySound(findViewById(R.id.green_button), RGV.ding);
-                        } else if (RGV.plays[j] == 3) {
-                            runAnimationAndPlaySound(findViewById(R.id.blue_button), RGV.dong);
-                        } else if (RGV.plays[j] == 4) {
-                            runAnimationAndPlaySound(findViewById(R.id.yellow_button), RGV.high_ding);
+                        if (TGV.plays[j] == 1) {
+                            runAnimationAndPlaySound(findViewById(R.id.red_button), TGV.bell);
+                        } else if (TGV.plays[j] == 2) {
+                            runAnimationAndPlaySound(findViewById(R.id.green_button), TGV.ding);
+                        } else if (TGV.plays[j] == 3) {
+                            runAnimationAndPlaySound(findViewById(R.id.blue_button), TGV.dong);
+                        } else if (TGV.plays[j] == 4) {
+                            runAnimationAndPlaySound(findViewById(R.id.yellow_button), TGV.high_ding);
                         }
 
-                        Log.i("Loop end", "RGV.plays[j] = " + RGV.plays[j]);
+                        Log.i("Loop end", "TGV.plays[j] = " + TGV.plays[j]);
 
                         Thread.sleep(1000);
 
                     }
-                    RGV.animationIsRunning = false;
+                    TGV.animationIsRunning = false;
                     enableButtons();
                 } catch (InterruptedException e) {
                     e.printStackTrace();
@@ -187,8 +185,8 @@ public class SimonTricksterGame extends AppCompatActivity {
 
     private void initializePlays() {
         for (int i = 0; i < 20; i++) {
-            if (RGV.plays[i] == 0 || RGV.plays == null) {
-                RGV.plays[i] = RGV.random.nextInt(4) + 1;  // 1 -4
+            if (TGV.plays[i] == 0 || TGV.plays == null) {
+                TGV.plays[i] = TGV.random.nextInt(4) + 1;  // 1 -4
             }
         }
     }
@@ -205,77 +203,77 @@ public class SimonTricksterGame extends AppCompatActivity {
         public void run() {
 
             //do the ontouchlistener stuff
-            switch (RGV.currentButton.getId()) {
+            switch (TGV.currentButton.getId()) {
                 case R.id.red_button:
-                    RGV.buttonClick = 1;
-                    //playSound(RGV.bell);
+                    TGV.buttonClick = 1;
+                    //playSound(TGV.bell);
                     break;
                 case R.id.green_button:
-                    RGV.buttonClick = 2;
+                    TGV.buttonClick = 2;
                     break;
                 case R.id.blue_button:
-                    RGV.buttonClick = 3;
+                    TGV.buttonClick = 3;
                     break;
                 case R.id.yellow_button:
-                    RGV.buttonClick = 4;
+                    TGV.buttonClick = 4;
                     break;
             }
 
-            if (RGV.plays[RGV.numOfClicks] != RGV.buttonClick) {
+            if (TGV.plays[TGV.numOfClicks] != TGV.buttonClick) {
                 Log.i("Player lost.", "");
                 rightButtonClicked = false;
 
                 cancelTurn();
-                playSound(RGV.lose);
+                playSound(TGV.lose);
                 disableButtons();
-                gameOverAlertDialog();
+                adHelper.gameOverAlertDialog();
 
             } else {
                 rightButtonClicked = true;
 
-                if (RGV.currentButton.getId() == R.id.red_button) {
+                if (TGV.currentButton.getId() == R.id.red_button) {
                     buttonToAnimate = R.id.red_button;
-                    soundToPlay = RGV.bell;
-                } else if (RGV.currentButton.getId() == R.id.green_button) {
-                    //runAnimationAndPlaySound(findViewById(R.id.green_button_sr), RGV.ding);
+                    soundToPlay = TGV.bell;
+                } else if (TGV.currentButton.getId() == R.id.green_button) {
+                    //runAnimationAndPlaySound(findViewById(R.id.green_button_sr), TGV.ding);
                     buttonToAnimate = R.id.green_button;
-                    soundToPlay = RGV.ding;
-                } else if (RGV.currentButton.getId() == R.id.blue_button) {
-                    //runAnimationAndPlaySound(findViewById(R.id.blue_button_sr), RGV.dong);
+                    soundToPlay = TGV.ding;
+                } else if (TGV.currentButton.getId() == R.id.blue_button) {
+                    //runAnimationAndPlaySound(findViewById(R.id.blue_button_sr), TGV.dong);
                     buttonToAnimate = R.id.blue_button;
-                    soundToPlay = RGV.dong;
-                } else if (RGV.currentButton.getId() == R.id.yellow_button) {
-                    //runAnimationAndPlaySound(findViewById(R.id.yellow_button_sr), RGV.high_ding);
+                    soundToPlay = TGV.dong;
+                } else if (TGV.currentButton.getId() == R.id.yellow_button) {
+                    //runAnimationAndPlaySound(findViewById(R.id.yellow_button_sr), TGV.high_ding);
                     buttonToAnimate = R.id.yellow_button;
-                    soundToPlay = RGV.high_ding;
+                    soundToPlay = TGV.high_ding;
                 }
 
-                RGV.numOfClicks++;
+                TGV.numOfClicks++;
                 runAnimationAndPlaySound(findViewById(buttonToAnimate), soundToPlay);
 
-                if (RGV.numOfBlocksToClick == RGV.numOfClicks) {
+                if (TGV.numOfBlocksToClick == TGV.numOfClicks) {
                     finishedTheRound = true;
 
-                    RGV.score++;
-                    RGV.numOfClicks = 0;
+                    TGV.score++;
+                    TGV.numOfClicks = 0;
                     //disableButtons();
 
-                    if (RGV.numOfBlocksToClick > RGV.highestScore) {
+                    if (TGV.numOfBlocksToClick > TGV.highestScore) {
                         newHighScore = true;
-                        RGV.highestScore = RGV.numOfBlocksToClick;
+                        TGV.highestScore = TGV.numOfBlocksToClick;
 
                         // green stuff cannot be the same in another class                 // right here below
                         SharedPreferences highScoresSimonRewind = getSharedPreferences("HIGHSCORESimonTrickster", Context.MODE_PRIVATE);
                         SharedPreferences.Editor editorSimonRewind = highScoresSimonRewind.edit();
                         // right here below
-                        editorSimonRewind.putInt("HIGHSCORESimonTrickster", RGV.highestScore);
+                        editorSimonRewind.putInt("HIGHSCORESimonTrickster", TGV.highestScore);
                         editorSimonRewind.commit();
                     }
                 }
             }
 
 
-            Log.i("Button clicked: ", "" + RGV.buttonClick);
+            Log.i("Button clicked: ", "" + TGV.buttonClick);
             Log.i("Right button clicked: ", "" + rightButtonClicked);
             Log.i("Finished the round: ", "" + finishedTheRound);
             Log.i("New high score: ", "" + newHighScore);
@@ -283,10 +281,10 @@ public class SimonTricksterGame extends AppCompatActivity {
 
             if (finishedTheRound) {
 
-                if (RGV.score == RGV.winningScore) {
-                    gameWonAlertDialog();
+                if (TGV.score == TGV.winningScore) {
+                    adHelper.gameWonAlertDialog();
                 } else {
-                    RGV.numOfBlocksToClick++;
+                    TGV.numOfBlocksToClick++;
                     final Runnable runnable = new Runnable() {
                         public void run() {
                             playAnimation();
@@ -304,22 +302,22 @@ public class SimonTricksterGame extends AppCompatActivity {
                             + " finishedTheround: " + finishedTheRound
                             + " newHighScore: " + newHighScore);
                     if (!rightButtonClicked) {
-                        playSound(RGV.lose);
+                        playSound(TGV.lose);
                         findViewById(R.id.start_button).setEnabled(true);
 
                     } else if (rightButtonClicked) { // right button was clicked
-                        RGV.scoreText.setText("Score: " + RGV.score);
+                        TGV.scoreText.setText("Score: " + TGV.score);
 
-                        if (RGV.score > RGV.highestScore) {
+                        if (TGV.score > TGV.highestScore) {
                             TextView tv = findViewById(R.id.highestscore_textview);
-                            tv.setText("High score: " + RGV.highestScore);
-                            Log.i("HIGH SCORE", "High score: " + RGV.highestScore);
+                            tv.setText("High score: " + TGV.highestScore);
+                            Log.i("HIGH SCORE", "High score: " + TGV.highestScore);
                         }
                     }
                 }
             });
 
-            RGV.buttonClickedForThisRound = false;
+            TGV.buttonClickedForThisRound = false;
             setAllBoolsToFalse();
             //when done, set all booleans back to false
         }
@@ -333,8 +331,8 @@ public class SimonTricksterGame extends AppCompatActivity {
 
 
     private void playSound(int soundId) {
-        if (RGV.soundsLoaded.contains(soundId)) {
-            RGV.soundPool.play(soundId, 1.0f, 1.0f, 0, 0, 1.0f);
+        if (TGV.soundsLoaded.contains(soundId)) {
+            TGV.soundPool.play(soundId, 1.0f, 1.0f, 0, 0, 1.0f);
         }
     }
 
@@ -355,78 +353,9 @@ public class SimonTricksterGame extends AppCompatActivity {
         playSound(sound);
 
         // when button auto clicks, it will animate
-        RGV.animation.setDuration(300);
-        RGV.animation.setInterpolator(new LinearInterpolator());
-        view.startAnimation(RGV.animation);
-    }
-
-    private void showRulesAlertDialog() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(SimonTricksterGame.this); // need a new one because of running activity
-        builder.setTitle("Simon Rewind");
-        //builder.setMessage("You lost :( \n Click 'Play again!' or 'home' to go back to home.");
-        builder.setMessage("Welcome to Simon Rewind!\n\n " +
-                "Your goal is to repeat the sequence of buttons in REVERSE order.\n\n" +
-                "Good luck!\n\n");
-
-        builder.setNegativeButton("LET'S PLAY!", new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int choice) {
-            }
-        });
-
-        AlertDialog dialog = builder.create();
-        dialog.show();
-        dialog.getWindow().setLayout(1100, 700);
-    }
-
-    private void gameWonAlertDialog() {
-        cancelTurn();
-        //Toast.makeText(getApplicationContext(), "GAME OVER!", Toast.LENGTH_SHORT).show();
-        AlertDialog.Builder builder = new AlertDialog.Builder(SimonTricksterGame.this); // need a new one because of running activity
-        builder.setTitle("GAME OVER!");
-        //builder.setMessage("You lost :( \n Click 'Play again!' or 'home' to go back to home.");
-        builder.setMessage("You WON!!! \n Your score was " + RGV.score + "\nClick 'home' to go back to home.");
-
-        builder.setNegativeButton("HOME", new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int choice) {
-                // Dismiss Dialog
-                Intent i = new Intent(getApplicationContext(), MainActivity.class);
-                getApplicationContext().startActivity(i);
-            }
-        });
-
-        AlertDialog dialog = builder.create();
-        //user can't click out of alertdialog
-        dialog.setCanceledOnTouchOutside(false);
-
-        dialog.show();
-        dialog.getWindow().setLayout(1100, 600);
-    }
-
-    private void gameOverAlertDialog() {
-        cancelTurn();
-        Toast.makeText(getApplicationContext(), "GAME OVER!", Toast.LENGTH_SHORT).show();
-        AlertDialog.Builder builder = new AlertDialog.Builder(SimonTricksterGame.this); // need a new one because of running activity
-        builder.setTitle("GAME OVER!");
-        builder.setMessage("You lost :( \n Your score was " + RGV.score + "\nClick 'home' to go back to home.");
-
-        builder.setNegativeButton("HOME", new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int choice) {
-                // Dismiss Dialog
-                Intent i = new Intent(getApplicationContext(), MainActivity.class);
-                getApplicationContext().startActivity(i);
-            }
-        });
-
-        AlertDialog dialog = builder.create();
-
-        //user can't click out of alertdialog
-        dialog.setCanceledOnTouchOutside(false);
-        dialog.show();
-        dialog.getWindow().setLayout(1100, 600);
-    }
-
-    private void highScoreToast() {
-        Toast.makeText(getApplicationContext(), "HIGH SCORE!", Toast.LENGTH_SHORT).show();
+        TGV.animation.setDuration(300);
+        TGV.animation.setInterpolator(new LinearInterpolator());
+        view.startAnimation(TGV.animation);
     }
 
     private void enableButtons() {
@@ -444,11 +373,11 @@ public class SimonTricksterGame extends AppCompatActivity {
     }
 
     private void loadSoundPoolSounds() {
-        RGV.bell = RGV.soundPool.load(this, R.raw.bell, 1);
-        RGV.ding = RGV.soundPool.load(this, R.raw.bell, 1);
-        RGV.dong = RGV.soundPool.load(this, R.raw.bell, 1);
-        RGV.high_ding = RGV.soundPool.load(this, R.raw.bell, 1);
-        RGV.lose = RGV.soundPool.load(this, R.raw.lose, 1);
+        TGV.bell = TGV.soundPool.load(this, R.raw.bell, 1);
+        TGV.ding = TGV.soundPool.load(this, R.raw.bell, 1);
+        TGV.dong = TGV.soundPool.load(this, R.raw.bell, 1);
+        TGV.high_ding = TGV.soundPool.load(this, R.raw.bell, 1);
+        TGV.lose = TGV.soundPool.load(this, R.raw.lose, 1);
     }
 
 
@@ -509,8 +438,8 @@ public class SimonTricksterGame extends AppCompatActivity {
     }
 
     private void cancelTurn() {
-        if (RGV.buttonPressHandler != null) {
-            RGV.buttonPressHandler = null;
+        if (TGV.buttonPressHandler != null) {
+            TGV.buttonPressHandler = null;
         }
     }
 
@@ -541,6 +470,83 @@ public class SimonTricksterGame extends AppCompatActivity {
         @Override
         public void onClick(View view) {
             stopAudio();
+        }
+    }
+
+    public class SimonAlertDialogHelper {
+        private void showRulesAlertDialog() {
+            AlertDialog.Builder builder = new AlertDialog.Builder(SimonTricksterGame.this); // need a new one because of running activity
+            builder.setTitle("Simon Rewind");
+            //builder.setMessage("You lost :( \n Click 'Play again!' or 'home' to go back to home.");
+            builder.setMessage("Welcome to Simon Rewind!\n\n " +
+                    "Your goal is to repeat the sequence of buttons in REVERSE order.\n\n" +
+                    "Good luck!\n\n");
+
+            builder.setNegativeButton("LET'S PLAY!", new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int choice) {
+                }
+            });
+
+            AlertDialog dialog = builder.create();
+
+            //user can't click out of alertdialog
+            dialog.setCanceledOnTouchOutside(false);
+            dialog.show();
+            dialog.getWindow().setLayout(1100, 700);
+        }
+
+        private void gameWonAlertDialog() {
+            //cancelTurn();
+            //Toast.makeText(getApplicationContext(), "GAME OVER!", Toast.LENGTH_SHORT).show();
+            AlertDialog.Builder builder = new AlertDialog.Builder(SimonTricksterGame.this); // need a new one because of running activity
+            builder.setTitle("GAME OVER!");
+            //builder.setMessage("You lost :( \n Click 'Play again!' or 'home' to go back to home.");
+            builder.setMessage("You WON!!! \n Your score was " + TGV.score + ".\nClick 'home' to go back to home.");
+
+            builder.setNegativeButton("HOME", new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int choice) {
+                    // Dismiss Dialog
+                    Intent i = new Intent(getApplicationContext(), MainActivity.class);
+                    getApplicationContext().startActivity(i);
+                }
+            });
+
+            AlertDialog dialog = builder.create();
+            //user can't click out of alertdialog
+            dialog.setCanceledOnTouchOutside(false);
+
+            dialog.show();
+            dialog.getWindow().setLayout(1100, 600);
+        }
+
+        private void gameOverAlertDialog() {
+            //cancelTurn();
+            Toast.makeText(getApplicationContext(), "GAME OVER!", Toast.LENGTH_SHORT).show();
+            AlertDialog.Builder builder = new AlertDialog.Builder(SimonTricksterGame.this); // need a new one because of running activity
+            builder.setTitle("GAME OVER!");
+            //builder.setMessage("You lost :( \n Click 'Play again!' or 'home' to go back to home.");
+            builder.setMessage("You lost :( \n Your score was " + TGV.score + ".\nClick 'home' to go back to home.");
+
+            builder.setNegativeButton("HOME", new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int choice) {
+                    // Dismiss Dialog
+                    Intent i = new Intent(getApplicationContext(), MainActivity.class);
+                    getApplicationContext().startActivity(i);
+                }
+            });
+
+            AlertDialog dialog = builder.create();
+            dialog.setCanceledOnTouchOutside(false);
+            dialog.show();
+            dialog.getWindow().setLayout(1100, 600);
+        }
+
+        private void highScoreToast() {
+            Toast.makeText(getApplicationContext(), "HIGH SCORE!", Toast.LENGTH_SHORT).show();
+        }
+
+        private void animationRunningToast() {
+            Toast.makeText(getApplicationContext(), "WAIT! Pay attention to the sequence!", Toast.LENGTH_SHORT).show();
         }
     }
 }

@@ -28,6 +28,7 @@ public class SimonRewindGame extends AppCompatActivity {
     public MediaPlayer mediaPlayer;
 
     private GameValues RGV = new GameValues();
+    private SimonAlertDialogHelper adHelper = new SimonAlertDialogHelper();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -97,7 +98,7 @@ public class SimonRewindGame extends AppCompatActivity {
             }
         });
 
-        showRulesAlertDialog();
+        adHelper.showRulesAlertDialog();
     }
 
     View.OnTouchListener nullTouchListener = new View.OnTouchListener() {
@@ -129,6 +130,8 @@ public class SimonRewindGame extends AppCompatActivity {
                 };
 
                 t.start();
+            } else {
+                adHelper.animationRunningToast();
             }
         }
     };
@@ -140,7 +143,7 @@ public class SimonRewindGame extends AppCompatActivity {
             public void run() {
                 if (RGV.score >= RGV.highestScore) {
                     RGV.highestScore = RGV.score;
-                    highScoreToast();
+                    adHelper.highScoreToast();
 
                     SharedPreferences highScoresSimonOriginal = getSharedPreferences("HIGHSCORESimonRewind", Context.MODE_PRIVATE);
                     SharedPreferences.Editor editorSimonOriginal = highScoresSimonOriginal.edit();
@@ -238,7 +241,7 @@ public class SimonRewindGame extends AppCompatActivity {
                 cancelTurn();
                 playSound(RGV.lose);
                 disableButtons();
-                gameOverAlertDialog();
+                adHelper.gameOverAlertDialog();
                 //break;
 
             } else {
@@ -295,7 +298,7 @@ public class SimonRewindGame extends AppCompatActivity {
             if (finishedTheRound) {
 
                 if (RGV.score == RGV.winningScore) {
-                    gameWonAlertDialog();
+                    adHelper.gameWonAlertDialog();
                 } else {
                     RGV.numOfBlocksToClick++;
                     final Runnable runnable = new Runnable() {
@@ -371,77 +374,6 @@ public class SimonRewindGame extends AppCompatActivity {
         RGV.animation.setDuration(300);
         RGV.animation.setInterpolator(new LinearInterpolator());
         view.startAnimation(RGV.animation);
-    }
-
-    private void showRulesAlertDialog() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(SimonRewindGame.this); // need a new one because of running activity
-        builder.setTitle("Simon Rewind");
-        //builder.setMessage("You lost :( \n Click 'Play again!' or 'home' to go back to home.");
-        builder.setMessage("Welcome to Simon Rewind!\n\n " +
-                "Your goal is to repeat the sequence of buttons in REVERSE order.\n\n" +
-                "Good luck!\n\n");
-
-        builder.setNegativeButton("LET'S PLAY!", new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int choice) {
-            }
-        });
-
-        AlertDialog dialog = builder.create();
-
-        //user can't click out of alertdialog
-        dialog.setCanceledOnTouchOutside(false);
-        dialog.show();
-        dialog.getWindow().setLayout(1100, 700);
-    }
-
-    private void gameWonAlertDialog() {
-        cancelTurn();
-        //Toast.makeText(getApplicationContext(), "GAME OVER!", Toast.LENGTH_SHORT).show();
-        AlertDialog.Builder builder = new AlertDialog.Builder(SimonRewindGame.this); // need a new one because of running activity
-        builder.setTitle("GAME OVER!");
-        //builder.setMessage("You lost :( \n Click 'Play again!' or 'home' to go back to home.");
-        builder.setMessage("You WON!!! \n Your score was " + RGV.score + "\nClick 'home' to go back to home.");
-
-        builder.setNegativeButton("HOME", new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int choice) {
-                // Dismiss Dialog
-                Intent i = new Intent(getApplicationContext(), MainActivity.class);
-                getApplicationContext().startActivity(i);
-            }
-        });
-
-        AlertDialog dialog = builder.create();
-        //user can't click out of alertdialog
-        dialog.setCanceledOnTouchOutside(false);
-
-        dialog.show();
-        dialog.getWindow().setLayout(1100, 600);
-    }
-
-    private void gameOverAlertDialog() {
-        cancelTurn();
-        Toast.makeText(getApplicationContext(), "GAME OVER!", Toast.LENGTH_SHORT).show();
-        AlertDialog.Builder builder = new AlertDialog.Builder(SimonRewindGame.this); // need a new one because of running activity
-        builder.setTitle("GAME OVER!");
-        //builder.setMessage("You lost :( \n Click 'Play again!' or 'home' to go back to home.");
-        builder.setMessage("You lost :( \n Your score was " + RGV.score + "\nClick 'home' to go back to home.");
-
-        builder.setNegativeButton("HOME", new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int choice) {
-                // Dismiss Dialog
-                Intent i = new Intent(getApplicationContext(), MainActivity.class);
-                getApplicationContext().startActivity(i);
-            }
-        });
-
-        AlertDialog dialog = builder.create();
-        dialog.setCanceledOnTouchOutside(false);
-        dialog.show();
-        dialog.getWindow().setLayout(1100, 600);
-    }
-
-    private void highScoreToast() {
-        Toast.makeText(getApplicationContext(), "HIGH SCORE!", Toast.LENGTH_SHORT).show();
     }
 
     private void enableButtons() {
@@ -558,6 +490,83 @@ public class SimonRewindGame extends AppCompatActivity {
         @Override
         public void onClick(View view) {
             stopAudio();
+        }
+    }
+
+    public class SimonAlertDialogHelper {
+        private void showRulesAlertDialog() {
+            AlertDialog.Builder builder = new AlertDialog.Builder(SimonRewindGame.this); // need a new one because of running activity
+            builder.setTitle("Simon Rewind");
+            //builder.setMessage("You lost :( \n Click 'Play again!' or 'home' to go back to home.");
+            builder.setMessage("Welcome to Simon Rewind!\n\n " +
+                    "Your goal is to repeat the sequence of buttons in REVERSE order.\n\n" +
+                    "Good luck!\n\n");
+
+            builder.setNegativeButton("LET'S PLAY!", new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int choice) {
+                }
+            });
+
+            AlertDialog dialog = builder.create();
+
+            //user can't click out of alertdialog
+            dialog.setCanceledOnTouchOutside(false);
+            dialog.show();
+            dialog.getWindow().setLayout(1100, 700);
+        }
+
+        private void gameWonAlertDialog() {
+            cancelTurn();
+            //Toast.makeText(getApplicationContext(), "GAME OVER!", Toast.LENGTH_SHORT).show();
+            AlertDialog.Builder builder = new AlertDialog.Builder(SimonRewindGame.this); // need a new one because of running activity
+            builder.setTitle("GAME OVER!");
+            //builder.setMessage("You lost :( \n Click 'Play again!' or 'home' to go back to home.");
+            builder.setMessage("You WON!!! \n Your score was " + RGV.score + ".\nClick 'home' to go back to home.");
+
+            builder.setNegativeButton("HOME", new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int choice) {
+                    // Dismiss Dialog
+                    Intent i = new Intent(getApplicationContext(), MainActivity.class);
+                    getApplicationContext().startActivity(i);
+                }
+            });
+
+            AlertDialog dialog = builder.create();
+            //user can't click out of alertdialog
+            dialog.setCanceledOnTouchOutside(false);
+
+            dialog.show();
+            dialog.getWindow().setLayout(1100, 600);
+        }
+
+        private void gameOverAlertDialog() {
+            cancelTurn();
+            Toast.makeText(getApplicationContext(), "GAME OVER!", Toast.LENGTH_SHORT).show();
+            AlertDialog.Builder builder = new AlertDialog.Builder(SimonRewindGame.this); // need a new one because of running activity
+            builder.setTitle("GAME OVER!");
+            //builder.setMessage("You lost :( \n Click 'Play again!' or 'home' to go back to home.");
+            builder.setMessage("You lost :( \n Your score was " + RGV.score + ".\nClick 'home' to go back to home.");
+
+            builder.setNegativeButton("HOME", new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int choice) {
+                    // Dismiss Dialog
+                    Intent i = new Intent(getApplicationContext(), MainActivity.class);
+                    getApplicationContext().startActivity(i);
+                }
+            });
+
+            AlertDialog dialog = builder.create();
+            dialog.setCanceledOnTouchOutside(false);
+            dialog.show();
+            dialog.getWindow().setLayout(1100, 600);
+        }
+
+        private void highScoreToast() {
+            Toast.makeText(getApplicationContext(), "HIGH SCORE!", Toast.LENGTH_SHORT).show();
+        }
+
+        private void animationRunningToast() {
+            Toast.makeText(getApplicationContext(), "WAIT! Pay attention to the sequence!", Toast.LENGTH_SHORT).show();
         }
     }
 }
