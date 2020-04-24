@@ -1,3 +1,7 @@
+//Alexandria Banta
+//Amanda McNair
+//CSCI 4020
+
 package com.amandamcnair.assignment3;
 
 import android.media.SoundPool;

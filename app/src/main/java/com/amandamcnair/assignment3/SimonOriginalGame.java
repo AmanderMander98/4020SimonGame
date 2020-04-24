@@ -1,3 +1,7 @@
+//Alexandria Banta
+//Amanda McNair
+//CSCI 4020
+
 package com.amandamcnair.assignment3;
 
 import android.app.AlertDialog;
@@ -387,7 +391,7 @@ public class SimonOriginalGame extends AppCompatActivity {
     public void playAudio() {
         if (mediaPlayer == null) {
             mediaState = MainActivity.MediaState.NOT_READY;
-            mediaPlayer = MediaPlayer.create(getApplicationContext(), R.raw.mushroom_theme_0);
+            mediaPlayer = MediaPlayer.create(getApplicationContext(),R.raw.dungeon_theme);
             mediaPlayer.setLooping(true);
 
             mediaPlayer.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
