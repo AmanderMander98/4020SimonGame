@@ -487,7 +487,7 @@ public class SimonOriginalGame extends AppCompatActivity {
             builder.setTitle("Simon Rewind");
             //builder.setMessage("You lost :( \n Click 'Play again!' or 'home' to go back to home.");
             builder.setMessage("Welcome to Simon Rewind!\n\n " +
-                    "Your goal is to repeat the sequence of buttons in REVERSE order.\n\n" +
+                    "Your goal is to repeat the sequence of buttons in the order in which they appear.\n\n" +
                     "Good luck!\n\n");
 
             builder.setNegativeButton("LET'S PLAY!", new DialogInterface.OnClickListener() {
