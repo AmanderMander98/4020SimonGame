@@ -484,9 +484,9 @@ public class SimonOriginalGame extends AppCompatActivity {
     public class SimonAlertDialogHelper {
         private void showRulesAlertDialog() {
             AlertDialog.Builder builder = new AlertDialog.Builder(SimonOriginalGame.this); // need a new one because of running activity
-            builder.setTitle("Simon Rewind");
+            builder.setTitle("Simon Original");
             //builder.setMessage("You lost :( \n Click 'Play again!' or 'home' to go back to home.");
-            builder.setMessage("Welcome to Simon Rewind!\n\n " +
+            builder.setMessage("Welcome to Simon Original!\n\n " +
                     "Your goal is to repeat the sequence of buttons in the order in which they appear.\n\n" +
                     "Good luck!\n\n");
 

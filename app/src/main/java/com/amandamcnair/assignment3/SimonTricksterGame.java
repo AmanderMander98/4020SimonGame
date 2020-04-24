@@ -480,9 +480,9 @@ public class SimonTricksterGame extends AppCompatActivity {
     public class SimonAlertDialogHelper {
         private void showRulesAlertDialog() {
             AlertDialog.Builder builder = new AlertDialog.Builder(SimonTricksterGame.this); // need a new one because of running activity
-            builder.setTitle("Simon Rewind");
+            builder.setTitle("Simon Trickster");
             //builder.setMessage("You lost :( \n Click 'Play again!' or 'home' to go back to home.");
-            builder.setMessage("Welcome to Simon Rewind!\n\n " +
+            builder.setMessage("Welcome to Simon Trickster!\n\n " +
                     "Your goal is to repeat the sequence of buttons in the order in which they appear." +
                     " But watch out-- the button colors and sounds are the same!\n\n" +
                     "Good luck!\n\n");
@@ -497,7 +497,7 @@ public class SimonTricksterGame extends AppCompatActivity {
             //user can't click out of alertdialog
             dialog.setCanceledOnTouchOutside(false);
             dialog.show();
-            dialog.getWindow().setLayout(1100, 750);
+            dialog.getWindow().setLayout(1100, 800);
         }
 
         private void gameWonAlertDialog() {
